@@ -1,6 +1,6 @@
 $(function(){
 	// create sentiment analysis object
-	var sentiment = require('sentiment');
+	// var sentiment = require('sentiment');
 
 
 	$("#search_button").on('click', function() {
