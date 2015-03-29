@@ -26,6 +26,7 @@
     "ejs-locals": "^1.0.2",
     "express": "^4.12.3",
     "express-session": "^1.10.4",
+    "fs": "0.0.2",
     "lru-cache": "^2.5.0",
     "moment": "^2.9.0"
   }
