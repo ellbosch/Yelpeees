@@ -1,22 +1,51 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Om nom nom</title>
-	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
-	<link rel="stylesheet" type="text/css" href="css/style.css">
-</head>
+	<head>
+		<meta charset="utf-8">
+	    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+	    <meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Om nom nom</title>
+		<link rel="stylesheet" type="text/css" href="../public/stylesheets/bootstrap.min.css">
+		<link rel="stylesheet" type="text/css" href="../public/stylesheets/style.css">
+	</head>
+
 <body>
-	<div class="container">
-		<div class="row">
-			<div class="col-lg-6">
+	<nav class="navbar navbar-default navbar-static-top" data-spy="affix">
+      <div class="container">
+        <ul class="nav nav-pills pull-right">
+          <li type="button" class="btn btn-default navbar-btn btn-custom">Sign Up</li>
+          <li type="button" class="btn btn-default navbar-btn btn-custom">Log in</li>
+          <li type="button" class="btn btn-default navbar-btn btn-custom">Help</li>
+        </ul>
+      </div>
+    </nav>
+
+    &nbsp;
+	<div id="top-shadow" class="search centered">
+		<div class="foodsearch">
+			<div class="">
+				<div class="input-group">
+    				<span class="input-group-addon" id="basic-addon1">Food</span>
+		      		<input type="text" class="form-control" placeholder="Pizza, Burgers, Wings, etc." aria-describedby="basic-addon1">
+			    </div>
+
+			    &nbsp;
+	    		<div class="input-group">
+    				<span class="input-group-addon" id="basic-addon1">@</span>
+		      		<input type="text" class="form-control" placeholder="Restaurant (Optional)" aria-describedby="basic-addon1">
+			    </div>
+
+			    &nbsp;
 			    <div class="input-group">
-			      <input type="text" class="form-control" placeholder="Search for...">
-			      <span class="input-group-btn">
-			        <button class="btn btn-default" type="button">Go!</button>
-			      </span>
+			    	<span class="input-group-addon" id="basic-addon1">In</span>
+			    	<input type="text" class="form-control" placeholder="Location" aria-describedby="basic-addon1">
+			    </div>
+
+			    &nbsp;
+			    <div class="btn">
+			    	<span class="input-group-btn">
+				        <button class="btn btn-default" type="button">Search!</button>
+			      	</span>
 			    </div>
 			</div>
 		</div>
