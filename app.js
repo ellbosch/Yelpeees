@@ -27,6 +27,8 @@ app.use(session({secret: 'mypennkeygoeshere'}));
 
 routes.init(function() {
 	app.get( '/', routes.index );
+	app.get('/example', routes.example);
+	app.post('/example', routes.example);
 	/////////////////////
 
 	http.createServer( app ).listen( app.get( 'port' ), function(){
