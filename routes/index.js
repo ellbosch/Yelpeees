@@ -1,5 +1,6 @@
 
 var moment = require('moment');
+var sentiment = require('sentiment');
 var ejs = require('ejs');
   // , fs = require('fs')
   // , wallTemplate = fs.readFileSync(__dirname + '/../views/wall.ejs', 'utf8')
@@ -21,4 +22,10 @@ exports.example = function(req, res) {
 
 exports.index = function(req, res) {
 	res.render('index');
+}
+
+exports.sentiment_analysis = function(req, res) {
+	text = req.body.text;
+	result = sentiment(text);
+	res.send({result: result, success: true});
 }

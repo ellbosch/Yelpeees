@@ -11,7 +11,6 @@ var engine = require('ejs-locals');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
-var sentiment = require('sentiment');
 
 app.set('port', process.env.PORT || 8080);
 app.engine('ejs', engine);
@@ -30,6 +29,8 @@ routes.init(function() {
 	app.get('/example', routes.example);
 	app.post('/example', routes.example);
 	/////////////////////
+
+	app.post('/sentiment', routes.sentiment_analysis);
 
 	http.createServer( app ).listen( app.get( 'port' ), function(){
 		console.log( 'Open browser to http://localhost:' + app.get( 'port' ));
