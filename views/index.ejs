@@ -1,4 +1,38 @@
 <!DOCTYPE html>
+<script>
+    var visible = true;
+	// This function is called by jQuery on load / render
+	// of the document.  It can be used to initialize code
+  $(document).ready(function() {
+
+  	$("#Search").click(function() {
+      $("#error").html("");
+      if ($("input[name='food']").val().trim() == "") {
+        $("#error").html("Empty Food Field");
+      }
+      else {
+    		$.ajax({
+          url: "/Search",
+          type: "post",
+          data: "food=" + $("input[name='food']").val() + "&restaurant=" + $("input[name='restaurant']").val() + "&location=" + $("input[name='location']"),
+          success: function(response) {
+            if (response == "Success") {
+              window.location = '/home';
+            }
+            else if (response == "No restaurant with that name exists") {
+              $("#error").html("Invalid Restaurant");
+            }
+          },
+          error: function (xhr, ajaxOptions, thrownError) {
+            $("#error").html(xhr.responseText);
+          }
+    		});
+      }
+    });
+  });
+
+</script>
+
 <html>
 	<head>
 		<meta charset="utf-8">
@@ -30,34 +64,32 @@
 	</div>
 
 	<body>
-	    &nbsp;
+	    <br>
 		<div id="top-shadow" class="container centered">
-			<div class="foodsearch">
-				<div class="">
-					<div class="input-group">
-	    				<span class="input-group-addon" id="basic-addon1">Find</span>
-			      		<input type="text" class="form-control" placeholder="Pizza, Burgers, Wings, etc." aria-describedby="basic-addon1">
-				    </div>
+			<form id="foodsearch" action="/Search" get="POST">
+				<div class="input-group">
+    				<span class="input-group-addon" id="basic-addon1">Find</span>
+		      		<input type="text" name="food" class="form-control" placeholder="Pizza, Burgers, Wings, etc." aria-describedby="basic-addon1">
+			    </div>
 
-				    &nbsp;
-		    		<div class="input-group">
-	    				<span class="input-group-addon" id="basic-addon1">@</span>
-			      		<input type="text" class="form-control" placeholder="Restaurant (Optional)" aria-describedby="basic-addon1">
-				    </div>
+			    <br>
+	    		<div class="input-group">
+    				<span class="input-group-addon" id="basic-addon1">@</span>
+		      		<input type="text" name="restaurant" class="form-control" placeholder="Restaurant (Optional)" aria-describedby="basic-addon1">
+			    </div>
 
-				    &nbsp;
-				    <div class="input-group">
-				    	<span class="input-group-addon" id="basic-addon1">Near</span>
-				    	<input type="text" class="form-control" placeholder="Location" aria-describedby="basic-addon1">
-				    </div>
+			    <br>
+			    <div class="input-group">
+			    	<span class="input-group-addon" id="basic-addon1">Near</span>
+			    	<input type="text" name="location" class="form-control" placeholder="Location" aria-describedby="basic-addon1">
+			    </div>
 
-				    &nbsp;
-				    <div class="btn">
-				    	<span class="input-group-btn">
-					        <button id="search_button" class="btn btn-default" type="button">Search!</button>
-				      	</span>
-				    </div>
-				</div>
+			    <br>
+			    <div class="btn">
+			    	<span class="input-group-btn">
+				        <button type="submit" id="Search" class="btn btn-default">Search!</button>
+			      	</span>
+			    </div>
 			</div>
 		</div>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
