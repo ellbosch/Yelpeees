@@ -18,7 +18,11 @@
     </nav>
 
 	<body>
-	    
+	    <% for (var i = 0; i < results.length; i++) { %>
+		  <li class="search_result">
+		    <a href="/profile/<%= results[i].restaurant %>"><%= results[i].name %> <%= results[i].restaurant %> <%= results[i].location></a>
+		  </li>
+		<% } %>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 		<script type="text/javascript" src="script.js"></script>
 	</body>
