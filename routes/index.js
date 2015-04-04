@@ -24,27 +24,63 @@ exports.example = function(req, res) {
 }
 
 exports.index = function(req, res) {
+	// oracledb.getConnection(oracleConnectInfo, function(err, connection) {
+	// 	if (err) {
+	// 		console.log("Error connecting to oracle");
+	// 	} else {
+	// 		connection.execute(
+	// 			"SELECT name "
+	// 			+ "FROM businesses "
+	// 			+ "WHERE ROWNUM < 5",
+	// 			function(err, result) {
+	// 				if (err) {
+	// 					console.log(err);
+	// 				} else {
+	// 					console.log(result);
+	// 					console.log(result.rows);
+	// 					console.log(result.metaData);
+	// 					res.render('index');
+	// 				}
+	// 			});
+
+	// 		connection.release(function(err) {
+	// 			if (err) {
+	// 				console.log(err);
+	// 			}
+	// 		});
+	// 	}
+	// })
+	res.render('index');
+}
+
+ exports.getReviews = function (req, res) {
 	oracledb.getConnection(oracleConnectInfo, function(err, connection) {
 		if (err) {
-			console.log("Error connecting to oracle");
+			console.log(err.stack);
 		} else {
-			connection.execute(
-				"SELECT name "
-				+ "FROM businesses "
-				+ "WHERE ROWNUM < 5",
-				function(err, result) {
-					if (err) {
-						console.log(err);
-					} else {
-						console.log(result);
-						console.log(result.rows);
-						console.log(result.metaData);
-						res.render('index');
-					}
-				});
+			console.log("restaurant: " + req.body.restaurant);
+			var restaurant = req.body.restaurant;
+			var businessSelect = "'%" + restaurant.toLowerCase() + "%'";
+			connection.execute("SELECT B.name, B.address "
+				+ 			   "FROM businesses B "
+				+              "WHERE LOWER(B.name) LIKE " + businessSelect , function(err, result) {
+				if (err) {
+					console.log("error executing business query");
+					console.log(err);
+				} else {
+					console.log("result: " + result.rows);
+					connection.release(function(err) {
+						if (err) {
+							console.log(err);
+						} else {
+							res.send({success:true, data:result.rows})
+
+						}
+					});
+				}
+			});
 		}
-	})
-//	res.render('index');
+	});
 }
 
 exports.sentiment_analysis = function(req, res) {

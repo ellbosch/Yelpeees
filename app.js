@@ -28,6 +28,7 @@ routes.init(function() {
 	app.get( '/', routes.index );
 	app.get('/example', routes.example);
 	app.post('/example', routes.example);
+	app.post('/search', routes.getReviews)
 	/////////////////////
 
 	app.post('/sentiment', routes.sentiment_analysis);
