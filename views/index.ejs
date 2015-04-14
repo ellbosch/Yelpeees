@@ -19,25 +19,24 @@
 					async: true,
 					url: "/search",
 					type: "POST",
-					data: 
+					data:
 						{
 							"food": $("input[name='food']").val(), 
 							"restaurant":  $("input[name='restaurant']").val() 
 							// "location": $("input[name='location']".val())
-						}// ,
-					// success: function(data) {
-					// 	// console.log("data " + data.success);
-					// 	// data = JSON.parse(data);
-					// 	// if (data.success) {
-					// 	// 	console.log("got data from backend");
-					// 	// 	console.log(data.data);
-					// 	// }
+						},
+					success: function(data) {
+						data = JSON.parse(data);
+						console.log(data.success);
+						if (data.success) {
+							window.location = '/search_results';
+						}
 
-					// },
-					// error: function (xhr, ajaxOptions, thrownError) {
-					// 	console.log("error");
-					// $("#error").html(xhr.responseText);
-					// }
+					},
+					error: function (xhr, ajaxOptions, thrownError) {
+						console.log("error");
+					$("#error").html(xhr.responseText);
+					}
 	    		});
 		      }
 		    });

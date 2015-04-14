@@ -30,6 +30,7 @@ routes.init(function() {
 	app.get('/search', routes.getReviews);
 	app.post('/example', routes.example);
 	app.post('/search', routes.getReviews);
+	app.get('/search_results', routes.populateSearchResults);
 	/////////////////////
 
 	app.post('/sentiment', routes.sentiment_analysis);

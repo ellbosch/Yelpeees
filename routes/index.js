@@ -53,13 +53,21 @@ exports.index = function(req, res) {
 	res.render('index');
 }
 
+exports.populateSearchResults = function(req, res) {
+	if (! req.session.search_results) {
+		res.render('/');
+	}
+	else {
+		res.render('search', {results: JSON.stringify(req.session.search_results)});
+	}
+}
+
  exports.getReviews = function (req, res) {
- 	console.log("got to getReviews");
 	oracledb.getConnection(oracleConnectInfo, function(err, connection) {
 		if (err) {
 			console.log(err.stack);
 		}
-		console.log("restaurant: " + req.body.restaurant);
+		
 		var restaurant = req.body.restaurant;
 		var businessSelect = "'%" + restaurant.toLowerCase() + "%'";
 		connection.execute("SELECT B.name, B.address "
@@ -75,8 +83,9 @@ exports.index = function(req, res) {
 					if (err) {
 						console.log(err);
 						res.render('index');
-					}
-					res.render('search', {results: result.rows});
+					} 
+					req.session.search_results = result.rows;
+					res.send(JSON.stringify({success: true, data: JSON.stringify(result.rows)}));
 				});
 			}
 		});
