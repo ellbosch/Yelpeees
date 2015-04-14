@@ -1,6 +1,4 @@
 <!DOCTYPE html>
-
-
 <html>
 	<head>
 
@@ -26,20 +24,20 @@
 							"food": $("input[name='food']").val(), 
 							"restaurant":  $("input[name='restaurant']").val() 
 							// "location": $("input[name='location']".val())
-						},
-					success: function(data) {
-						console.log("data");
-						if (data.success) {
-							console.log("got data from backend");
-							console.log(response.data);
-						}
-						window.location.href = "/";
+						}// ,
+					// success: function(data) {
+					// 	// console.log("data " + data.success);
+					// 	// data = JSON.parse(data);
+					// 	// if (data.success) {
+					// 	// 	console.log("got data from backend");
+					// 	// 	console.log(data.data);
+					// 	// }
 
-					},
-					error: function (xhr, ajaxOptions, thrownError) {
-						console.log("error");
-					$("#error").html(xhr.responseText);
-					}
+					// },
+					// error: function (xhr, ajaxOptions, thrownError) {
+					// 	console.log("error");
+					// $("#error").html(xhr.responseText);
+					// }
 	    		});
 		      }
 		    });
@@ -78,7 +76,7 @@
 	<body>
 	    <br>
 		<div id="top-shadow" class="container centered">
-			<form id="foodsearch">
+			<form id="foodsearch" action="javascript:void(0);">
 				<div class="input-group">
     				<span class="input-group-addon" id="basic-addon1">Find</span>
 		      		<input type="text" name="food" class="form-control" placeholder="Pizza, Burgers, Wings, etc." aria-describedby="basic-addon1">

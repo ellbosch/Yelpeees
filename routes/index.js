@@ -75,10 +75,8 @@ exports.index = function(req, res) {
 					if (err) {
 						console.log(err);
 						res.render('index');
-					} 
-					res.send(JSON.stringify({success: true, data: "haha"/*data: JSON.stringify(result.rows)*/}));
-
-					// res.render('search', {results: result.rows});
+					}
+					res.render('search', {results: result.rows});
 				});
 			}
 		});
