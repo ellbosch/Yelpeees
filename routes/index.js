@@ -54,32 +54,34 @@ exports.index = function(req, res) {
 }
 
  exports.getReviews = function (req, res) {
+ 	console.log("got to getReviews");
 	oracledb.getConnection(oracleConnectInfo, function(err, connection) {
 		if (err) {
 			console.log(err.stack);
-		} else {
-			console.log("restaurant: " + req.body.restaurant);
-			var restaurant = req.body.restaurant;
-			var businessSelect = "'%" + restaurant.toLowerCase() + "%'";
-			connection.execute("SELECT B.name, B.address "
-				+ 			   "FROM businesses B "
-				+              "WHERE LOWER(B.name) LIKE " + businessSelect , function(err, result) {
-				if (err) {
-					console.log("error executing business query");
-					console.log(err);
-				} else {
-					console.log("result: " + result.rows);
-					connection.release(function(err) {
-						if (err) {
-							console.log(err);
-						} else {
-							res.send({success:true, data:result.rows})
-
-						}
-					});
-				}
-			});
 		}
+		console.log("restaurant: " + req.body.restaurant);
+		var restaurant = req.body.restaurant;
+		var businessSelect = "'%" + restaurant.toLowerCase() + "%'";
+		connection.execute("SELECT B.name, B.address "
+			+ 			   "FROM businesses B "
+			+              "WHERE LOWER(B.name) LIKE " + businessSelect , {}, {outFormat: oracledb.OBJECT}, function(err, result) {
+			if (err) {
+				console.log("error executing business query");
+				console.log(err);
+			} 
+			else {
+				console.log("result: " + JSON.stringify(result.rows));
+				connection.release(function(err) {
+					if (err) {
+						console.log(err);
+						res.render('index');
+					} 
+					res.send(JSON.stringify({success: true, data: "haha"/*data: JSON.stringify(result.rows)*/}));
+
+					// res.render('search', {results: result.rows});
+				});
+			}
+		});
 	});
 }
 

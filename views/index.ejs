@@ -17,24 +17,30 @@
 		        $("#error").html("Empty Food Field");
 		      }
 		      else {
-		    		$.ajax({
-			          url: "/search",
-			          type: "POST",
-			          data: "food=" + $("input[name='food']").val() + "&restaurant=" + $("input[name='restaurant']").val() + "&location=" + $("input[name='location']"),
-			          success: function(response) {
-			            if (response.success) {
-			            	console.log("got data from backend");
-			            	console.log(response.data);
-			              window.location = '/home';
-			            }
-			            else  {
-			              $("#error").html("Invalid Restaurant");
-			            }
-			          },
-			          error: function (xhr, ajaxOptions, thrownError) {
-			            $("#error").html(xhr.responseText);
-			          }
-		    		});
+	    		$.ajax({
+					async: true,
+					url: "/search",
+					type: "POST",
+					data: 
+						{
+							"food": $("input[name='food']").val(), 
+							"restaurant":  $("input[name='restaurant']").val() 
+							// "location": $("input[name='location']".val())
+						},
+					success: function(data) {
+						console.log("data");
+						if (data.success) {
+							console.log("got data from backend");
+							console.log(response.data);
+						}
+						window.location.href = "/";
+
+					},
+					error: function (xhr, ajaxOptions, thrownError) {
+						console.log("error");
+					$("#error").html(xhr.responseText);
+					}
+	    		});
 		      }
 		    });
 		  });
@@ -93,7 +99,7 @@
 			    <br>
 			    <div class="btn">
 			    	<span class="input-group-btn">
-				        <button id="Search" class="btn btn-default">Search!</button>
+				        <button type="submit" id="Search" class="btn">Search!</button>
 			      	</span>
 			    </div>
 			</form>
