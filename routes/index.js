@@ -70,12 +70,13 @@ exports.populateSearchResults = function(req, res) {
 		
 		var restaurant = req.body.restaurant;
 		var food = req.body.food;
-		var sqlRestaurant = "'%" + restaurant.toLowerCase() + "%' ";
-		var sqlFood = "'%" + food.toLowerCase() + "%' ";
-		connection.execute("SELECT B.name, B.address, R.text, avg(R.stars) as avgStars, max(R.rdate) as mostRecentRDate "
-			+ 			   "FROM businesses B INNER JOIN reviews R on B.business_id = R.business_id"
-			+              "WHERE LOWER(B.name) LIKE " + sqlRestaurant 
-			+              "AND LOWER(R.text) LIKE " + sqlFood , {}, {outFormat: oracledb.OBJECT}, function(err, result) {
+		var sqlRestaurant = "'%" + restaurant.toLowerCase() + "%'";
+		var sqlFood = "'%" + food.toLowerCase() + "%'";
+		connection.execute("SELECT B.name, B.address, R.text, R.stars, R.rdate "
+			+ 			   "FROM businesses B, reviews R "
+			+              "WHERE B.business_id = R.business_id AND LOWER(B.name) LIKE " + sqlRestaurant + " AND LOWER(R.text) LIKE " + sqlFood, 
+
+							{}, {outFormat: oracledb.OBJECT}, function(err, result) {
 			if (err) {
 				console.log("error executing business query");
 				console.log(err);
