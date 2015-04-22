@@ -69,16 +69,26 @@ exports.populateSearchResults = function(req, res) {
 		}
 		
 		var restaurant = req.body.restaurant;
-		var businessSelect = "'%" + restaurant.toLowerCase() + "%'";
-		connection.execute("SELECT B.name, B.address "
-			+ 			   "FROM businesses B "
-			+              "WHERE LOWER(B.name) LIKE " + businessSelect , {}, {outFormat: oracledb.OBJECT}, function(err, result) {
+		var food = req.body.food;
+		var sqlRestaurant = "'%" + restaurant.toLowerCase() + "%' ";
+		var sqlFood = "'%" + food.toLowerCase() + "%' ";
+		connection.execute("SELECT B.name, B.address, R.text, avg(R.stars) as avgStars, max(R.rdate) as mostRecentRDate "
+			+ 			   "FROM businesses B INNER JOIN reviews R on B.business_id = R.business_id"
+			+              "WHERE LOWER(B.name) LIKE " + sqlRestaurant 
+			+              "AND LOWER(R.text) LIKE " + sqlFood , {}, {outFormat: oracledb.OBJECT}, function(err, result) {
 			if (err) {
 				console.log("error executing business query");
 				console.log(err);
 			} 
 			else {
-				console.log("result: " + JSON.stringify(result.rows));
+				//console.log("result: " + JSON.stringify(result.rows));
+				var rows = result.rows;
+				for (var i = 0; i < rows.length; i++) {
+					console.log("row " + i);
+					if (i < 10) {
+						console.log("businessName: " + rows[i].NAME + ", review text: " + rows[i].TEXT);
+					}
+				}
 				connection.release(function(err) {
 					if (err) {
 						console.log(err);
