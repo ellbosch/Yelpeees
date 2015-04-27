@@ -38,6 +38,12 @@
 
 		    <div id="search-fields-div">
 		    	<form class="form-horizontal">
+			    	<div class="form-group">
+		    			<label for="search-food-input" class="col-sm-1 control-label">Location</label>
+		    			<div class="col-sm-5">
+			    			<input type="text" class="form-control" id="search-input-location" placeholder="Location">
+		    			</div>
+		    		</div>
 		    		<div class="form-group">
 		    			<label for="search-food-input" class="col-sm-1 control-label">Food</label>
 		    			<div class="col-sm-5">
@@ -45,9 +51,9 @@
 		    			</div>
 		    		</div>
 		    		<div class="form-group">
-		    			<label for="search-input-place" class="col-sm-1 control-label">Place</label>
+		    			<label for="search-input-restaurant" class="col-sm-1 control-label">Place</label>
 		    			<div class="col-sm-5">
-		    				<input type="text" class="form-control" id="search-input-place" placeholder="Restaurant, food truck, or other food venue">
+		    				<input type="text" class="form-control" id="search-input-restaurant" placeholder="Restaurant, food truck, or other food venue">
 		    			</div>
 		    		</div>
 		    		<div class="form-group">
@@ -78,38 +84,10 @@
 		    </div>
 		</div>
 
-<!-- 
-		<div id="top-shadow" class="container centered">
-			<form id="foodsearch" action="javascript:void(0);">
-				<div class="input-group">
-    				<span class="input-group-addon" id="basic-addon1">Find</span>
-		      		<input type="text" name="food" class="form-control" placeholder="Pizza, Burgers, Wings, etc." aria-describedby="basic-addon1">
-			    </div>
-
-			    <br>
-	    		<div class="input-group">
-    				<span class="input-group-addon" id="basic-addon1">@</span>
-		      		<input type="text" name="restaurant" class="form-control" placeholder="Restaurant (Optional)" aria-describedby="basic-addon1">
-			    </div>
-
-			    <br>
-			    <div class="input-group">
-			    	<span class="input-group-addon" id="basic-addon1">Near</span>
-			    	<input type="text" name="location" class="form-control" placeholder="Location" aria-describedby="basic-addon1">
-			    </div>
-
-			    <br>
-			    <div class="btn">
-			    	<span class="input-group-btn">
-				        <button type="submit" id="search-button" class="btn">Search!</button>
-			      	</span>
-			    </div>
-			</form>
-		</div> -->
-
 		<!-- LOADING SCREEN -->
 		<div id="loading-screen"></div>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 		<script type="text/javascript" src="/js/script.js"></script>
+		<script type="text/javascript" src="http://www.google.com/jsapi"></script>
 	</body>
 </html>

@@ -1,7 +1,21 @@
 $(function(){
+	// find current location
+	get_current_location();
+
+
+	function get_current_location() {
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(function (position) {
+			    var lat = position.coords.latitude;
+			    var lng = position.coords.longitude;
+			    $("#search-input-location").val(lat + ", " + lng);
+			});
+		}
+	}
+
 	// show search inputs when search button is clicked
 	$("#search-box #search-btn").on('click', function() {
-		$("#search-fields-div").show();
+		$("#search-fields-div").toggle();
 	});
 
 
@@ -12,7 +26,8 @@ $(function(){
 		$("#loading-screen").show();
 
 		var food_input = $("#search-input-food").val().trim();
-		var restaurant_input = $("#search-input-place").val();
+		var restaurant_input = $("#search-input-restaurant").val().trim();
+		var location_input = $("#search-input-location").val().trim();
 
 		if (food_input == "") {
 			$("#error").html("Empty Food Field");
@@ -21,12 +36,11 @@ $(function(){
 				async: true,
 				url: "/search",
 				type: "POST",
-				data: 
-				{
-					"food": food_input, 
-					"restaurant":  restaurant_input 
-							// "location": $("input[name='location']".val())
-						},
+				data: {
+						"food": food_input, 
+						"restaurant":  restaurant_input,
+						"location": location_input
+					},
 					success: function(data) {
 						var data_result = JSON.parse(data)["data"];
 						var reviews_result = JSON.parse(data_result);
@@ -39,11 +53,71 @@ $(function(){
 					},
 					error: function (xhr, ajaxOptions, thrownError) {
 						console.log("error");
-					$("#error").html(xhr.responseText);
+						$("#error").html(xhr.responseText);
 					}
-				});
+			});
 		}
 	});
+
+
+// 	$("#Search").click(function() {
+// 		$("#error").html("");
+// 		var lat;
+// 		var lng;
+// 		if (navigator.geolocation) {
+// 			navigator.geolocation.getCurrentPosition(function (position) {
+// 			    lat = position.coords.latitude;
+// 			    lng = position.coords.longitude;
+
+// 			    if ($("input[name='food']").val().trim() == "") {
+// 					$("#error").html("Empty Food Field");
+// 				}
+// 				else {
+// 					$.ajax({
+// 						async: true,
+// 						url: "/search",
+// 						type: "POST",
+// 						data: 
+// 							( $("input[name='location']").val().trim() == "" ? 
+// 								{
+// 									"food": $("input[name='food']").val(), 
+// 									"restaurant":  $("input[name='restaurant']").val(),
+// 									"location": lat + "," + lng
+// 								} :
+// 								{
+// 									"food": $("input[name='food']").val(), 
+// 									"restaurant":  $("input[name='restaurant']").val(),
+// 									"location": $("input[name='location']").val()
+// 								}
+// 							)
+// 					});
+// 				}
+// 			});
+// 		}
+// 		else {
+// 			if ($("input[name='food']").val().trim() == "") {
+// 				$("#error").html("Empty Food Field");
+// 			}
+// 			else if ($("input[name='location']").val().trim() == "") {
+// 				$("#error").html("Empty Location Field");
+// 			}
+// 			else {
+// 				$.ajax({
+// 					async: true,
+// 					url: "/search",
+// 					type: "POST",
+// 					data: 
+// 						{
+// 							"food": $("input[name='food']").val(), 
+// 							"restaurant":  $("input[name='restaurant']").val(),
+// 							"location": $("input[name='location'])").val()
+// 						}
+// >>>>>>> c32a05515a0d3f7f056a54f87bc422c1ee3ff6a0
+	// 			});
+	// 		}
+	// 	}
+		
+	// });
 	
 	// displays food review data
 	function display_food_data(food_input, data) {
@@ -59,37 +133,7 @@ $(function(){
 		var btn_str = "<strong>" + food_input_cap + "</strong> at <strong>" + restaurant_name + "</strong>"
 		$("#search-btn-query").html(btn_str);
 	}
-
-
-
-	// get current location
-	// var visible = true;
-	// var geocoder;
-
-	// navigator.geolocation.getCurrentPosition(function (pos) {
-	//     var geocoder = new google.maps.Geocoder();
-	//     var lat = pos.coords.latitude;
-	//     var lng = pos.coords.longitude;
-	//     var latlng = new google.maps.LatLng(lat, lng);
-
-	//     //reverse geocode the coordinates, returning location information.
-	//     geocoder.geocode({ 'latLng': latlng }, function (results, status) {
-	//         var result = results[0];
-	//         var city = '';
-
-	//         for (var i = 0, len = result.address_components.length; i < len; i++) {
-	//             var ac = result.address_components[i];
-
-	//             if (ac.types.indexOf('administrative_area_level_3') >= 0) {
-	//                 city = ac.short_name;
-	//             }
-	//         }
-
-	//         $('location').val(city);
-
-	//     });
-	// });
-
+	
 
 	// sentiment analysis
 	function run_sentiment_analysis(text) {
