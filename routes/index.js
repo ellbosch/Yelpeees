@@ -33,6 +33,17 @@ exports.populateSearchResults = function(req, res) {
 	}
 }
 
+var within10miles = function (lat1, long1, lat2, long2) {
+	gm.distance(lat1 + "," + long1, lat2 + "," + long2, function(err, data) {
+		if (err) {
+			throw err;
+		}
+		if(parseFloat(data.rows[0].elements[0].distance.text.split(" ")[0]) < 16.0934) {
+			// within 10 miles
+		}
+	});
+}
+
  exports.getReviews = function (req, res) {
 	oracledb.getConnection(oracleConnectInfo, function(err, connection) {
 		if (err) {
