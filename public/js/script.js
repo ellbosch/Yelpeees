@@ -24,11 +24,14 @@ $(function(){
 		// add errors to any inputs that are empty
 		for (var i = 0; i < all_divs.length; i++) {
 			var input = $(all_divs[i]).find("input")[0];
-			var input_str = $(input).val();
 
-			if (input_str == undefined || !input_str.trim()) {
-				$(all_divs[i]).addClass("has-error");
-				is_valid = false;
+			if (input != undefined) {
+				var input_str = $(input).val().trim();
+
+				if (!input_str) {
+					$(all_divs[i]).addClass("has-error");
+					is_valid = false;
+				}
 			}
 		}
 		return is_valid;
