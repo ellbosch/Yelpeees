@@ -13,25 +13,62 @@ $(function(){
 		}
 	}
 
+	// checks for empty inputs
+	function check_for_valid_inputs($form) {
+		var is_valid = true;				// return true if all inputs have strings
+		var all_divs = $form.find(".form-group");
+
+		// remove input errors
+		$($form).find(".form-group").removeClass("has-error");
+
+		// add errors to any inputs that are empty
+		for (var i = 0; i < all_divs.length; i++) {
+			var input = $(all_divs[i]).find("input")[0];
+			var input_str = $(input).val();
+
+			if (input_str == undefined || !input_str.trim()) {
+				$(all_divs[i]).addClass("has-error");
+				is_valid = false;
+			}
+		}
+		return is_valid;
+	}
+
+	// displays food review data
+	function display_food_data(food_input, data) {
+		// hide loading screen and search boxes
+		$("#loading-screen").hide();
+		$("#search-fields-div").hide();
+
+
+		var restaurant_name = data[0]["NAME"];
+		var food_input_cap = food_input.charAt(0).toUpperCase() + food_input.substring(1);
+
+		// set text to search button
+		var btn_str = "<strong>" + food_input_cap + "</strong> at <strong>" + restaurant_name + "</strong>"
+		$("#search-btn-query").html(btn_str);
+	}
+	
+
 	// show search inputs when search button is clicked
 	$("#search-box #search-btn").on('click', function() {
 		$("#search-fields-div").toggle();
 	});
 
-
+	// event handler for when a search is made
 	$("#search-input-btn").on('click', function(event) {
 		event.preventDefault();
+		var is_valid = check_for_valid_inputs($("#search-fields-div form"));
 
-		// show loading screen
-		$("#loading-screen").show();
+		// below only executes if all inputs have entries
+		if (is_valid) {
+			// show loading screen
+			$("#loading-screen").show();
 
-		var food_input = $("#search-input-food").val().trim();
-		var restaurant_input = $("#search-input-restaurant").val().trim();
-		var location_input = $("#search-input-location").val().trim();
+			var food_input = $("#search-input-food").val().trim();
+			var restaurant_input = $("#search-input-restaurant").val().trim();
+			var location_input = $("#search-input-location").val().trim();
 
-		if (food_input == "") {
-			$("#error").html("Empty Food Field");
-		} else {
 			$.ajax({
 				async: true,
 				url: "/search",
@@ -45,7 +82,7 @@ $(function(){
 						var data_result = JSON.parse(data)["data"];
 						var reviews_result = JSON.parse(data_result);
 
-						// display data
+						// display food data
 						if (reviews_result.length > 0) {
 							display_food_data(food_input, reviews_result);
 						}
@@ -112,27 +149,11 @@ $(function(){
 // 							"restaurant":  $("input[name='restaurant']").val(),
 // 							"location": $("input[name='location'])").val()
 // 						}
-// >>>>>>> c32a05515a0d3f7f056a54f87bc422c1ee3ff6a0
 	// 			});
 	// 		}
 	// 	}
 		
 	// });
-	
-	// displays food review data
-	function display_food_data(food_input, data) {
-		// hide loading screen and search boxes
-		$("#loading-screen").hide();
-		$("#search-fields-div").hide();
-
-
-		var restaurant_name = data[0]["NAME"];
-		var food_input_cap = food_input.charAt(0).toUpperCase() + food_input.substring(1);
-
-		// set text to search button
-		var btn_str = "<strong>" + food_input_cap + "</strong> at <strong>" + restaurant_name + "</strong>"
-		$("#search-btn-query").html(btn_str);
-	}
 	
 
 	// sentiment analysis
