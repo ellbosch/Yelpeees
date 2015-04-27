@@ -67,7 +67,7 @@ exports.populateSearchResults = function(req, res) {
 		if (err) {
 			console.log(err.stack);
 		}
-		
+		var location = req.body.location;
 		var restaurant = req.body.restaurant;
 		var food = req.body.food;
 		var sqlRestaurant = "'%" + restaurant.toLowerCase() + "%'";
@@ -76,27 +76,40 @@ exports.populateSearchResults = function(req, res) {
 			+ 			   "FROM businesses B, reviews R "
 			+              "WHERE B.business_id = R.business_id AND LOWER(B.name) LIKE " + sqlRestaurant + " AND LOWER(R.text) LIKE " + sqlFood, 
 
-							{}, {outFormat: oracledb.OBJECT}, function(err, result) {
+							{}, {outFormat: oracledb.OBJECT}, function(err, reviewsResult) {
 			if (err) {
 				console.log("error executing business query");
 				console.log(err);
 			} 
 			else {
-				//console.log("result: " + JSON.stringify(result.rows));
-				var rows = result.rows;
-				for (var i = 0; i < rows.length; i++) {
-					console.log("row " + i);
-					if (i < 10) {
-						console.log("businessName: " + rows[i].NAME + ", review text: " + rows[i].TEXT);
+				connection.execute("SELECT B.name, B.address, T.text, T.tdate "
+			+ 			   "FROM businesses B, tips T "
+			+              "WHERE B.business_id = T.business_id AND LOWER(B.name) LIKE " + sqlRestaurant + " AND LOWER(T.text) LIKE " + sqlFood, 
+
+							{}, {outFormat: oracledb.OBJECT}, function(err, tipsResult) {
+
+					//console.log("result: " + JSON.stringify(result.rows));
+					var reviews = reviewsResult.rows;
+					var tips = tipsResult.rows;
+					var numReviews = reviewsResult.rowsAffected;
+					var numTips = tipsResult.rowsAffected;
+					var count = 0;
+					console.log("num reviews affected: " + numReviews);
+					for (var i = 0; i < reviews.length; i++) {
+						count++
+						if (i < 10) {
+							console.log("businessName: " + reviews[i].NAME + ", review text: " + reviews[i].TEXT);
+						}
 					}
-				}
-				connection.release(function(err) {
-					if (err) {
-						console.log(err);
-						res.render('index');
-					} 
-					req.session.search_results = result.rows;
-					res.send(JSON.stringify({success: true, data: JSON.stringify(result.rows)}));
+					console.log("review count: " + count);
+					connection.release(function(err) {
+						if (err) {
+							console.log(err);
+							res.render('index');
+						} 
+						req.session.search_results = result.rows;
+						res.send(JSON.stringify({success: true, data: JSON.stringify(reviewsResult.rows)}));
+					});
 				});
 			}
 		});
