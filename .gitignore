@@ -29,6 +29,7 @@ build/Release
 
 # Credentials are different
 config.json
+package.json
 
 *.class
 
