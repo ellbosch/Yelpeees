@@ -59,20 +59,19 @@ exports.populateSearchResults = function(req, res) {
 
 							{}, {outFormat: oracledb.OBJECT}, function(err, tipsResult) {
 
-					//console.log("result: " + JSON.stringify(result.rows));
 					var reviews = reviewsResult.rows;
 					var tips = tipsResult.rows;
-					var numReviews = reviewsResult.rowsAffected;
-					var numTips = tipsResult.rowsAffected;
-					var count = 0;
-					console.log("num reviews affected: " + numReviews);
-					for (var i = 0; i < reviews.length; i++) {
-						count++
-						if (i < 10) {
-							console.log("businessName: " + reviews[i].NAME + ", review text: " + reviews[i].TEXT);
-						}
-					}
-					console.log("review count: " + count);
+					var sentiments = sentiment_analysis(reviews, food.toLowerCase());
+					console.log(sentiments);
+					//var count = 0;
+					// console.log("num reviews affected: " + numReviews);
+					// for (var i = 0; i < reviews.length; i++) {
+					// 	count++
+					// 	if (i < 10) {
+					// 		console.log("businessName: " + reviews[i].NAME + ", review text: " + reviews[i].TEXT);
+					// 	}
+					// }
+					// console.log("review count: " + count);
 					connection.release(function(err) {
 						if (err) {
 							console.log(err);
@@ -85,6 +84,58 @@ exports.populateSearchResults = function(req, res) {
 			}
 		});
 	});
+}
+
+function sentiment_analysis(reviews, term) {
+
+	var sentiments = [];
+	var minSentiment = Number.NEGATIVE_INFINITY;
+	var maxSentiment = Number.MAX_VALUE;
+	for (review in reviews) {
+		var text = reviews[review].TEXT;
+		var sent = analyzeReview(text, term);
+		sentiments.push(sent);
+		if (sentiment < minSentiment) {
+			minSentiment = sentiment;
+		} 
+		if (sentiment > maxSentiment) {
+			maxSentiment = sentiment;
+		}
+	}
+	var sum = 0;
+	for (sent in sentiments) {
+		sum += sentiments[sent];
+	}
+	var avg = sum/sentiments.length;
+	var result = {"avg": avg, "min": minSentiment, "max":maxSentiment};
+	return result;
+}
+
+
+function analyzeReview(review, searchTerm){
+	console.log("text to search: " + review);
+	var n=0, pos=0, sumSentiments = 0.0;
+    var step = searchTerm.length;
+    var length = review.length;
+
+    while(true){
+        pos = review.indexOf(review,pos);
+        if (pos >= 0) { 
+        	var lowPos = Math.min(0, pos - 30);
+        	lowPos = (review.indexOf(" ", Math.max(0, pos-30))) 
+        	var highPos = Math.min(length - 1, pos + 30);
+        	var nextSpace = review.indexOf(" ", highPos);
+        	if (nextSpace != -1) {
+        		highPos = nextSpace;
+        	}
+        	var pSentiment = sentiment(review.substring(lowPos, highPos));
+        	console.log("occurence sentiment: " + pSentiment);
+        	sumSentiments += pSentiment;
+            n++; 
+        	pos+=step; 
+        } else break;
+    }
+    return(sumSentiments/n);
 }
 
 exports.sentiment_analysis = function(req, res) {
