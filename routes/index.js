@@ -100,37 +100,39 @@ var within10miles = function (lat1, long1, lat2, long2) {
 function sentiment_analysis(reviews, term) {
 
 	var sentiments = [];
-	var minSentiment = Number.NEGATIVE_INFINITY;
-	var maxSentiment = Number.MAX_VALUE;
+	var minSentiment = Number.MAX_VALUE;
+	var maxSentiment = Number.NEGATIVE_INFINITY;
 	for (review in reviews) {
 		var text = reviews[review].TEXT;
 		var sent = analyzeReview(text, term);
+		console.log("sentiment for review total: " + sent);
 		sentiments.push(sent);
-		if (sentiment < minSentiment) {
-			minSentiment = sentiment;
-		} 
-		if (sentiment > maxSentiment) {
-			maxSentiment = sentiment;
-		}
 	}
+	console.log("all the sentiments: " + sentiments);
 	var sum = 0;
 	for (sent in sentiments) {
 		sum += sentiments[sent];
+		if (sentiments[sent] < minSentiment) {
+			minSentiment = sentiments[sent];
+		} 
+		if (sentiments[sent] > maxSentiment) {
+			maxSentiment = sentiments[sent];
+		}
 	}
+	console.log("sum of all sentiments");
+
 	var avg = sum/sentiments.length;
-	var result = {"avg": avg, "min": minSentiment, "max":maxSentiment};
-	return result;
+	return {"avg": avg, "min": minSentiment, "max":maxSentiment};
 }
 
 
 function analyzeReview(review, searchTerm){
-	console.log("text to search: " + review);
 	var n=0, pos=0, sumSentiments = 0.0;
     var step = searchTerm.length;
     var length = review.length;
 
     while(true){
-        pos = review.indexOf(review,pos);
+        pos = review.indexOf(searchTerm,pos);
         if (pos >= 0) { 
         	var lowPos = Math.min(0, pos - 30);
         	lowPos = (review.indexOf(" ", Math.max(0, pos-30))) 
@@ -140,13 +142,16 @@ function analyzeReview(review, searchTerm){
         		highPos = nextSpace;
         	}
         	var pSentiment = sentiment(review.substring(lowPos, highPos));
-        	console.log("occurence sentiment: " + pSentiment);
-        	sumSentiments += pSentiment;
+        	sumSentiments += parseFloat(pSentiment.score);
             n++; 
         	pos+=step; 
         } else break;
     }
-    return(sumSentiments/n);
+    console.log("sum sentiments: " + sumSentiments);
+    console.log("n: " + n);
+    console.log("average sentiment: " + sumSentiments/n);
+    var avg = (n == 0) ? 0 : sumSentiments/n;
+    return avg;
 }
 
 exports.sentiment_analysis = function(req, res) {
