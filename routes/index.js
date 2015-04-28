@@ -56,7 +56,8 @@ var within10miles = function (lat1, long1, lat2, long2) {
 		var sqlFood = "'%" + food.toLowerCase() + "%'";
 		connection.execute("SELECT B.name, B.address, R.text, R.stars, R.rdate "
 			+ 			   "FROM businesses B, reviews R "
-			+              "WHERE B.business_id = R.business_id AND LOWER(B.name) LIKE " + sqlRestaurant + " AND LOWER(R.text) LIKE " + sqlFood, 
+			+              "WHERE B.business_id = R.business_id AND LOWER(B.name) LIKE " + sqlRestaurant + " AND LOWER(R.text) LIKE " + sqlFood
+			+              " ORDER BY B.business_id" , 
 
 							{}, {outFormat: oracledb.OBJECT}, function(err, reviewsResult) {
 			if (err) {
@@ -66,23 +67,32 @@ var within10miles = function (lat1, long1, lat2, long2) {
 			else {
 				connection.execute("SELECT B.name, B.address, T.text, T.tdate "
 			+ 			   "FROM businesses B, tips T "
-			+              "WHERE B.business_id = T.business_id AND LOWER(B.name) LIKE " + sqlRestaurant + " AND LOWER(T.text) LIKE " + sqlFood, 
+			+              "WHERE B.business_id = T.business_id AND LOWER(B.name) LIKE " + sqlRestaurant + " AND LOWER(T.text) LIKE " + sqlFood
+			+ 			   " ORDER BY B.business_id" , 
 
 							{}, {outFormat: oracledb.OBJECT}, function(err, tipsResult) {
 
 					var reviews = reviewsResult.rows;
 					var tips = tipsResult.rows;
+					var firstId = reviews[0].BUSINESS_ID;
+					var reviewSet = [];
+					var sentimentSet = [];
+					var i = 0;
+					while (i < reviews.length) {
+						while (reviews[i].BUSINESS_ID == firstId) {
+							reviewSet.push(reviews[i].TEXT);
+							i++;
+						}
+						if (reviewSet.length > 0) {
+							sentimentSet.push(sentiment_analysis(reviewSet, food.toLowerCase()));
+						}
+						
+					}	
+					
+
 					var sentiments = sentiment_analysis(reviews, food.toLowerCase());
 					console.log(sentiments);
-					//var count = 0;
-					// console.log("num reviews affected: " + numReviews);
-					// for (var i = 0; i < reviews.length; i++) {
-					// 	count++
-					// 	if (i < 10) {
-					// 		console.log("businessName: " + reviews[i].NAME + ", review text: " + reviews[i].TEXT);
-					// 	}
-					// }
-					// console.log("review count: " + count);
+					
 					connection.release(function(err) {
 						if (err) {
 							console.log(err);
@@ -105,10 +115,8 @@ function sentiment_analysis(reviews, term) {
 	for (review in reviews) {
 		var text = reviews[review].TEXT;
 		var sent = analyzeReview(text, term);
-		console.log("sentiment for review total: " + sent);
 		sentiments.push(sent);
 	}
-	console.log("all the sentiments: " + sentiments);
 	var sum = 0;
 	for (sent in sentiments) {
 		sum += sentiments[sent];
@@ -119,8 +127,6 @@ function sentiment_analysis(reviews, term) {
 			maxSentiment = sentiments[sent];
 		}
 	}
-	console.log("sum of all sentiments");
-
 	var avg = sum/sentiments.length;
 	return {"avg": avg, "min": minSentiment, "max":maxSentiment};
 }
