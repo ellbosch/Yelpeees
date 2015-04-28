@@ -1,132 +1,93 @@
 <!DOCTYPE html>
 <html>
 	<head>
-
-		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-		<script>
-		    var visible = true;
-		    var geocoder;
-		    
-			// This function is called by jQuery on load / render
-			// of the document.  It can be used to initialize code
-		  $(document).ready(function() {
-
-		  	$("#Search").click(function() {
-		      $("#error").html("");
-		      if ($("input[name='food']").val().trim() == "") {
-		        $("#error").html("Empty Food Field");
-		      }
-		      else {
-	    		$.ajax({
-					async: true,
-					url: "/search",
-					type: "POST",
-					data: 
-						{
-							"food": $("input[name='food']").val(), 
-							"restaurant":  $("input[name='restaurant']").val() 
-							// "location": $("input[name='location']".val())
-						}// ,
-					// success: function(data) {
-					// 	// console.log("data " + data.success);
-					// 	// data = JSON.parse(data);
-					// 	// if (data.success) {
-					// 	// 	console.log("got data from backend");
-					// 	// 	console.log(data.data);
-					// 	// }
-
-					// },
-					// error: function (xhr, ajaxOptions, thrownError) {
-					// 	console.log("error");
-					// $("#error").html(xhr.responseText);
-					// }
-	    		});
-		      }
-		    });
-		  });
-			navigator.geolocation.getCurrentPosition(function (pos) {
-		    var geocoder = new google.maps.Geocoder();
-		    var lat = pos.coords.latitude;
-		    var lng = pos.coords.longitude;
-		    var latlng = new google.maps.LatLng(lat, lng);
-
-		    //reverse geocode the coordinates, returning location information.
-		    geocoder.geocode({ 'latLng': latlng }, function (results, status) {
-		        var result = results[0];
-		        var city = '';
-
-		        for (var i = 0, len = result.address_components.length; i < len; i++) {
-		            var ac = result.address_components[i];
-
-		            if (ac.types.indexOf('administrative_area_level_3') >= 0) {
-		                city = ac.short_name;
-		            }
-		        }
-
-		        $('location').val(city);
-
-		    });
-		});
-		</script>
-				
 		<meta charset="utf-8">
 	    <meta http-equiv="X-UA-Compatible" content="IE=edge">
 	    <meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>Om nom nom</title>
+		<!-- BOOTSTRAP -->
 		<link rel="stylesheet" type="text/css" href="stylesheets/bootstrap.min.css">
-		<link rel="stylesheet" type="text/css" href="stylesheets/style.css">
 		<link rel="stylesheet" type="text/css" href="../public/stylesheets/bootstrap.min.css">
+		<!-- FONT AEWESOME ICONS -->
+		<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+		<!-- CUSTOM STYLES -->
+		<link rel="stylesheet" type="text/css" href="stylesheets/style.css">
 		<link rel="stylesheet" type="text/css" href="../public/stylesheets/style.css">
 	</head>
+	<body>
+    	<!-- NAV BAR -->
+    	<div id="navbar-container">
+		    <div id="navbar">
+	    		<div id="navbar-title"><span>Yelpeees</span></div>
 
-	<nav class="navbar navbar-default navbar-static-top" data-spy="affix">
-      <div class="container">
-        <ul class="nav nav-pills pull-right">
-          <li type="button" class="btn btn-primary navbar-btn btn-custom">Sign Up</li>
-          <li type="button" class="btn btn-default navbar-btn btn-custom">Log in</li>
-          <li type="button" class="btn btn-default navbar-btn btn-custom">Help</li>
-        </ul>
-      </div>
-    </nav>
+	    		<!-- SEARCH BOX -->
+	    		<div id="search-box">
+		    		<div id="search-btn">
+		    			<i class="fa fa-search"></i>
+		    			<span id="search-btn-query">Search</span>
+	    			</div>
+				</div>
 
-	<div class="jumbotron">
-		<div class="container">
-		  <h1>Munch Away!</h1>
-		  <p>Here at MunchAway, we pride ourselves in finding the best place to fulfill your munchie desires.</p>
-		  <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a></p>
+				<!-- MENU ITEMS -->
+		    	<ul id="menu">
+		    		<li><a>Sign Up</a></li>
+					<li><a>Log in</a></li>
+					<li><a>Help</a></li>    		
+		    	</ul>
+		    </div>
+
+		    <div id="search-fields-div">
+		    	<form class="form-horizontal">
+			    	<div class="form-group">
+		    			<label for="search-food-input" class="col-sm-1 control-label">Location</label>
+		    			<div class="col-sm-5">
+			    			<input type="text" class="form-control" id="search-input-location" placeholder="Location">
+		    			</div>
+		    		</div>
+		    		<div class="form-group">
+		    			<label for="search-food-input" class="col-sm-1 control-label">Food</label>
+		    			<div class="col-sm-5">
+			    			<input type="text" class="form-control" id="search-input-food" placeholder="Food">
+		    			</div>
+		    		</div>
+		    		<div class="form-group">
+		    			<label for="search-input-restaurant" class="col-sm-1 control-label">Place</label>
+		    			<div class="col-sm-5">
+		    				<input type="text" class="form-control" id="search-input-restaurant" placeholder="Restaurant, food truck, or other food venue">
+		    			</div>
+		    		</div>
+		    		<div class="form-group">
+		    			<div class="col-sm-offset-1">
+		    				<button type="submit" class="btn btn-default" id="search-input-btn">Search</button>
+		    			</div>
+		    		</div>
+		    	</form>
+		    </div>
+	    </div>
+
+	    <div class="container-fluid">
+		    <!-- RESULT DIV -->
+		    <div class="container-fluid" id="wrapper-result">
+				<div class="row" id="result-div">
+
+					<!-- FOOD INFO -->
+					<div class=".col-xs-12 .col-sm-8" id="result-left">
+
+					</div>
+
+					<!-- FOOD REVIEW -->
+					<div class=".col-xs-12 .col-sm-4" id="result-right">
+						
+					</div>
+
+				</div>
+		    </div>
 		</div>
-	</div>
 
-	<body onload="initialize()">
-	    <br>
-		<div id="top-shadow" class="container centered">
-			<form id="foodsearch" action="javascript:void(0);">
-				<div class="input-group">
-    				<span class="input-group-addon" id="basic-addon1">Find</span>
-		      		<input type="text" name="food" class="form-control" placeholder="Pizza, Burgers, Wings, etc." aria-describedby="basic-addon1">
-			    </div>
-
-			    <br>
-	    		<div class="input-group">
-    				<span class="input-group-addon" id="basic-addon1">@</span>
-		      		<input type="text" name="restaurant" class="form-control" placeholder="Restaurant (Optional)" aria-describedby="basic-addon1">
-			    </div>
-
-			    <br>
-			    <div class="input-group">
-			    	<span class="input-group-addon" id="basic-addon1">Near</span>
-			    	<input type="text" name="location" class="form-control" placeholder="Location" aria-describedby="basic-addon1">
-			    </div>
-
-			    <br>
-			    <div class="btn">
-			    	<span class="input-group-btn">
-				        <button type="submit" id="Search" class="btn">Search!</button>
-			      	</span>
-			    </div>
-			</form>
-		</div>
+		<!-- LOADING SCREEN -->
+		<div id="loading-screen"></div>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 		<script type="text/javascript" src="/js/script.js"></script>
+		<script type="text/javascript" src="http://www.google.com/jsapi"></script>
 	</body>
 </html>

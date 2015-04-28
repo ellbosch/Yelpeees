@@ -1,16 +1,4 @@
-.nav a {
-  color: #5a5a5a;
-  font-size: 11px;
-  font-weight: bold;
-  padding: 14px 10px;
-  text-transform: uppercase;
-}
-
-.nav li {
-  display: inline;
-}
-
-.top-shadow {
+/*.top-shadow {
 position: fixed;
 top: 0;
 left: 20px;
@@ -23,20 +11,6 @@ box-shadow: 0 8px 8px rgba(0, 0, 0, 0.5);
 display: none;
 }
 
-.navbar.affix{ /* position fixed navbar */
-top:0; 
-width:100%;
-}
-
-.navbar{    
- /* lift .navbar above #top-shadow */
-}
-
-.navbar-default {
-    background-color: #FE5A43;
-    border-color: #E7E7E7;
-    z-index:1000;
-}
 
 .centered {
     margin: 0 auto;
@@ -60,4 +34,120 @@ width:100%;
   text-shadow: 0 1px 1px rgba(255, 255, 255, 0.00);
   text-transform: uppercase;
   -webkit-font-smoothing: antialiased;
+} */
+
+
+/* NAV */
+#navbar-container {
+  background-color: rgba(240, 240, 240, 0.8);
+  position: fixed;
+  width: 100%;
+  border-bottom: 1px solid rgb(220, 220, 220);
 }
+
+#navbar {
+  height: 50px;
+}
+
+#menu, #navbar-title{
+  display: inline-block;
+  line-height: 50px;
+}
+
+#navbar-title {
+  margin: 0 20px;
+}
+
+
+/* SEARCH */
+#search-box {
+  display: inline-block;
+  width: 100px;
+}
+
+#search-box i {
+  padding: 0 5px;
+}
+
+#search-box #search-btn {
+  background-color: #fff;
+  border-radius: 4px;
+  border: 1px solid rgba(204, 204, 204, 0.8);
+  padding: 8px;
+}
+
+#search-box #search-btn:hover {
+  cursor: pointer;
+}
+
+#search-fields-div {
+  display: none;
+  width: 100%;
+  background-color: rgba(240, 240, 240, 0.8);
+  border-top: 1px solid rgb(230, 230, 230);
+  padding-bottom: 10px;
+}
+
+#search-fields-div form {
+  margin-left: 11px;
+  margin-top: 10px;
+}
+
+#search-input-btn {
+  margin-left: 15px;
+}
+
+
+/* MENU */
+#menu {
+  float: right;
+  padding-left: 0;
+  margin: 0;
+}
+
+#menu li {
+  list-style-type: none;
+  display: inline;
+}
+
+#menu li a {
+  padding: 20px 10px;
+}
+
+#menu li a:hover {
+  cursor: pointer;
+}
+
+/* LOADING SCREEN */
+#loading-screen {
+  height: 100%;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.5);
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+
+@media (min-width : 590px) {
+  #search-box {
+    width: 300px;
+  }
+
+  #search-box i {
+    padding: 0 8px;
+  }
+}
+
+
+/* TABLETS AND UP */
+@media (min-width : 768px) {
+
+}
+
+/* Medium devices (desktops, 992px and up) */
+/*@media (min-width: @screen-md-min) { }*/
+
+/* Large devices (large desktops, 1200px and up) */
+/*@media (min-width: @screen-lg-min) { }*/
