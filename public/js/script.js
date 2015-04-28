@@ -42,7 +42,7 @@ $(function(){
 	// displays food review data
 	function display_food_data(food_input, data, sentiment_rating) {
 		$("#loading-screen").hide();		// hide loading screen
-		$("#food-item-div").show();			// show food-item-div if it is not already showing
+		$("#wrapper-result").show();			// show food-item-div if it is not already showing
 
 		var restaurant_name = data[0]["NAME"];
 		var food_input_cap = food_input.charAt(0).toUpperCase() + food_input.substring(1);
@@ -73,7 +73,8 @@ $(function(){
 	// cancels query
 	function cancel_query() {
 		$("#loading-screen").hide();
-		$("#food-item-div").hide();
+		$("#wrapper-result").hide();
+		$("#search-fields-div").show();
 		jqXHR.abort();
 	}
 	
@@ -87,6 +88,7 @@ $(function(){
 	$("#search-input-btn").on('click', function(event) {
 		event.preventDefault();
 		var is_valid = check_for_valid_inputs($("#search-fields-div form"));
+		$("#error-div").hide();
 
 		// below only executes if all inputs have entries
 		if (is_valid) {
@@ -118,7 +120,7 @@ $(function(){
 						if (reviews_result.length == 0) {
 							cancel_query();
 							// show error message when no reviews are returned from query
-							$("#reviews-div").html("<div class='alert alert-warning' role='alert'>No reviews found!</div>")
+							$("#error-div").show();
 						} else {
 							// display food data
 							display_food_data(food_input, reviews_result, parseFloat(sentiment_result["avg"]));
