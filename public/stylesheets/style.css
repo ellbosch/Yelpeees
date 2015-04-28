@@ -37,12 +37,19 @@ display: none;
 } */
 
 
+body {
+  /*background-color: #f6f6f6;*/
+}
+
 /* NAV */
+
 #navbar-container {
   background-color: rgba(240, 240, 240, 0.8);
   position: fixed;
   width: 100%;
   border-bottom: 1px solid rgb(220, 220, 220);
+  z-index: 100;
+  top: 0;
 }
 
 #navbar {
@@ -55,14 +62,22 @@ display: none;
 }
 
 #navbar-title {
-  margin: 0 20px;
+  margin: 0 10px;
 }
 
 
 /* SEARCH */
+
 #search-box {
   display: inline-block;
   width: 100px;
+  vertical-align: middle;
+}
+
+#search-box #search-btn {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 #search-box i {
@@ -99,6 +114,7 @@ display: none;
 
 
 /* MENU */
+
 #menu {
   float: right;
   padding-left: 0;
@@ -118,19 +134,74 @@ display: none;
   cursor: pointer;
 }
 
+
 /* LOADING SCREEN */
+
 #loading-screen {
   height: 100%;
   width: 100%;
-  background-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.9);
   display: none;
   position: fixed;
   top: 0;
   left: 0;
+  z-index: 200;
+}
+
+#loading-container {
+  position: absolute;
+  width: 100%;
+  top: 100px;
+}
+
+#loading-text-div {
+  text-align: center;
+  margin-top: 50px;
+}
+
+#loading-text-div a:hover {
+  cursor: pointer;
+}
+
+
+/* REVIEW DATA */
+
+
+#wrapper-result {
+  padding: 0;
+  margin-top: 50px;
+}
+
+#food-item-header {
+  margin-top: 10px;
+  font-weight: bold;
+  font-size: 30px;
+}
+
+#progress-div {
+  display: inline-block; 
+  margin-left: 10px;
+}
+
+.progress {
+  height: 6px;
+  width: 300px;
+  margin: 0;
+  border-radius: 2px;
+}
+
+#rating-span {
+  font-size: 12px;
+  font-style: italic;
+  color: #777;
 }
 
 
 @media (min-width : 590px) {
+  #navbar-title {
+    margin: 0 20px;
+  }
+
   #search-box {
     width: 300px;
   }

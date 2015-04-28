@@ -1,4 +1,6 @@
 $(function(){
+	var jqXHR;
+
 	// find current location
 	get_current_location();
 
@@ -39,9 +41,11 @@ $(function(){
 
 	// displays food review data
 	function display_food_data(food_input, data) {
-		// hide loading screen and search boxes
+		// hide loading screen
 		$("#loading-screen").hide();
-		$("#search-fields-div").hide();
+
+		// show food-item-div if it is not already showing
+		$("#food-item-div").show();
 
 
 		var restaurant_name = data[0]["NAME"];
@@ -50,6 +54,25 @@ $(function(){
 		// set text to search button
 		var btn_str = "<strong>" + food_input_cap + "</strong> at <strong>" + restaurant_name + "</strong>"
 		$("#search-btn-query").html(btn_str);
+
+		// set text to header
+		$("#food-item-header").html(food_input.toUpperCase());
+
+		// show new yelp reviews
+		var review_html = "";
+		for (var i = 0; i < data.length; i++) {
+			var review = data[i];
+			review_html = review_html + "<div class='review'><p>" + review["TEXT"] + "</p></div>"
+		}
+		$("#num-reviews").html(data.length);	// show number of reviews
+		$("#reviews-div").html(review_html);	// show reviews
+	}
+
+	// cancels query
+	function cancel_query() {
+		$("#loading-screen").hide();
+		$("#food-item-div").hide();
+		jqXHR.abort();
 	}
 	
 
@@ -65,14 +88,14 @@ $(function(){
 
 		// below only executes if all inputs have entries
 		if (is_valid) {
-			// show loading screen
-			$("#loading-screen").show();
+			$("#loading-screen").show();	// show loading screen
+			$("#search-fields-div").hide();	// hide search field divs
 
 			var food_input = $("#search-input-food").val().trim();
 			var restaurant_input = $("#search-input-restaurant").val().trim();
 			var location_input = $("#search-input-location").val().trim();
 
-			$.ajax({
+			jqXHR = $.ajax({
 				async: true,
 				url: "/search",
 				type: "POST",
@@ -82,21 +105,29 @@ $(function(){
 						"location": location_input
 					},
 					success: function(data) {
+						$("#reviews-div").html("");		// hide old review data
 						var data_result = JSON.parse(data)["data"];
 						var reviews_result = JSON.parse(data_result);
 
-						// display food data
-						if (reviews_result.length > 0) {
+						if (reviews_result.length == 0) {
+							cancel_query();
+							// show error message when no reviews are returned from query
+							$("#reviews-div").html("<div class='alert alert-warning' role='alert'>No reviews found!</div>")
+						} else {
+							// display food data
 							display_food_data(food_input, reviews_result);
 						}
-
 					},
 					error: function (xhr, ajaxOptions, thrownError) {
-						console.log("error");
-						$("#error").html(xhr.responseText);
+						// console.log("error");
 					}
 			});
 		}
+	});
+
+	// event handler for canceling loads
+	$("#cancel-load").on('click', function() {
+		cancel_query();	
 	});
 
 
