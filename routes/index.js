@@ -99,7 +99,7 @@ var within10miles = function (lat1, long1, lat2, long2) {
 							res.render('index');
 						} 
 						req.session.search_results = reviewsResult.rows;
-						res.send(JSON.stringify({success: true, data: JSON.stringify(reviewsResult.rows)}));
+						res.send(JSON.stringify({success: true, data: JSON.stringify(reviewsResult.rows), sentiment: sentiments}));
 					});
 				});
 			}
@@ -148,7 +148,7 @@ function analyzeReview(review, searchTerm){
         		highPos = nextSpace;
         	}
         	var pSentiment = sentiment(review.substring(lowPos, highPos));
-        	sumSentiments += parseFloat(pSentiment.score);
+        	sumSentiments += parseFloat(pSentiment.score) + 4;
             n++; 
         	pos+=step; 
         } else break;
