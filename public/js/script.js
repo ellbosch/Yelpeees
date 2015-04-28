@@ -40,16 +40,13 @@ $(function(){
 	}
 
 	// displays food review data
-	function display_food_data(food_input, data) {
-		// hide loading screen
-		$("#loading-screen").hide();
-
-		// show food-item-div if it is not already showing
-		$("#food-item-div").show();
-
+	function display_food_data(food_input, data, sentiment_rating) {
+		$("#loading-screen").hide();		// hide loading screen
+		$("#food-item-div").show();			// show food-item-div if it is not already showing
 
 		var restaurant_name = data[0]["NAME"];
 		var food_input_cap = food_input.charAt(0).toUpperCase() + food_input.substring(1);
+		var rating = Math.round(sentiment_rating/12 * 100);
 
 		// set text to search button
 		var btn_str = "<strong>" + food_input_cap + "</strong> at <strong>" + restaurant_name + "</strong>"
@@ -58,14 +55,19 @@ $(function(){
 		// set text to header
 		$("#food-item-header").html(food_input.toUpperCase());
 
+		// show rating
+		$("#progress-div .progress-bar-success").width(rating + "%");
+		$("#progress-div .progress-bar-danger").width((100-rating) + "%");
+		$("#sentiment-rating").html(rating);	// show rating percentage
+		$("#num-reviews").html(data.length);	// show number of reviews
+
 		// show new yelp reviews
 		var review_html = "";
 		for (var i = 0; i < data.length; i++) {
 			var review = data[i];
 			review_html = review_html + "<div class='review'><p>" + review["TEXT"] + "</p></div>"
 		}
-		$("#num-reviews").html(data.length);	// show number of reviews
-		$("#reviews-div").html(review_html);	// show reviews
+		$("#reviews-div").html(review_html);
 	}
 
 	// cancels query
@@ -106,8 +108,12 @@ $(function(){
 					},
 					success: function(data) {
 						$("#reviews-div").html("");		// hide old review data
-						var data_result = JSON.parse(data)["data"];
+						var data_parsed = JSON.parse(data);
+						var data_result = data_parsed["data"];
+						var sentiment_result = data_parsed["sentiment"];
 						var reviews_result = JSON.parse(data_result);
+
+						console.log(reviews_result);
 
 						if (reviews_result.length == 0) {
 							cancel_query();
@@ -115,7 +121,7 @@ $(function(){
 							$("#reviews-div").html("<div class='alert alert-warning' role='alert'>No reviews found!</div>")
 						} else {
 							// display food data
-							display_food_data(food_input, reviews_result);
+							display_food_data(food_input, reviews_result, parseFloat(sentiment_result["avg"]));
 						}
 					},
 					error: function (xhr, ajaxOptions, thrownError) {

@@ -96,7 +96,6 @@ body {
 }
 
 #search-fields-div {
-  display: none;
   width: 100%;
   background-color: rgba(240, 240, 240, 0.8);
   border-top: 1px solid rgb(230, 230, 230);
