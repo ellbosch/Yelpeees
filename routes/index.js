@@ -76,22 +76,30 @@ var within10miles = function (lat1, long1, lat2, long2) {
 					var tips = tipsResult.rows;
 					var firstId = reviews[0].BUSINESS_ID;
 					var reviewSet = [];
-					var sentimentSet = [];
-					var i = 0;
-					while (i < reviews.length) {
+					var result = [];
+					var i, j, count = 0;
+					while (i < reviews.length && j < tips.length) {
+						var name = reviews[i].NAME;
+						var address = reviews[i].ADDRESS;
+						count = 0;
 						while (reviews[i].BUSINESS_ID == firstId) {
 							reviewSet.push(reviews[i].TEXT);
 							i++;
+							count++;
+						}
+						while (j < tips.length && tips[j].BUSINESS_ID == firstId) {
+							reviewSet.push(tips[j].TEXT);
+							j++;
+							count++;
 						}
 						if (reviewSet.length > 0) {
-							sentimentSet.push(sentiment_analysis(reviewSet, food.toLowerCase()));
+							result.push(JSON.stringify({"business_name":name, "address":address, "rating":sentiment_analysis(reviewSet, food.toLowerCase()), "num_reviews":count}));
 						}
-						
+						if (i < reviews.length) {
+							firstId = reviews[i].BUSINESS_ID;
+						}
 					}	
-					
-
-					var sentiments = sentiment_analysis(reviews, food.toLowerCase());
-					console.log(sentiments);
+					console.log(result);
 					
 					connection.release(function(err) {
 						if (err) {
@@ -99,7 +107,7 @@ var within10miles = function (lat1, long1, lat2, long2) {
 							res.render('index');
 						} 
 						req.session.search_results = reviewsResult.rows;
-						res.send(JSON.stringify({success: true, data: JSON.stringify(reviewsResult.rows), sentiment: sentiments}));
+						res.send(JSON.stringify({success: true, data: result}));
 					});
 				});
 			}
@@ -113,7 +121,7 @@ function sentiment_analysis(reviews, term) {
 	var minSentiment = Number.MAX_VALUE;
 	var maxSentiment = Number.NEGATIVE_INFINITY;
 	for (review in reviews) {
-		var text = reviews[review].TEXT;
+		var text = reviews[review];
 		var sent = analyzeReview(text, term);
 		sentiments.push(sent);
 	}
@@ -148,7 +156,7 @@ function analyzeReview(review, searchTerm){
         		highPos = nextSpace;
         	}
         	var pSentiment = sentiment(review.substring(lowPos, highPos));
-        	sumSentiments += parseFloat(pSentiment.score) + 4;
+        	sumSentiments += parseFloat(pSentiment.score);
             n++; 
         	pos+=step; 
         } else break;
