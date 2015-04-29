@@ -31,6 +31,7 @@ routes.init(function() {
 	app.post('/example', routes.example);
 	app.post('/search', routes.getReviews);
 	app.get('/search_results', routes.populateSearchResults);
+	app.post('/get_zipcode', routes.getZipcode);
 	/////////////////////
 
 	app.post('/sentiment', routes.sentiment_analysis);

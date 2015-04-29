@@ -4,19 +4,50 @@ $(function(){
 	// find current location
 	get_current_location();
 
+	// convert coordinates to address info
+	function reverse_geocode(coords, show_current_location) {
+		var parsed_data;
+
+		$.ajax({
+				async: true,
+				url: "/get_zipcode",
+				type: "POST",
+				dataType: "json",
+				data: {
+						"coords": coords
+					},
+					success: function(data) {
+						parsed_data = data;
+						show_current_location(data);
+					},
+					error: function (xhr, ajaxOptions, thrownError) {
+						// console.log("error");
+					}
+			});
+
+		return parsed_data;
+	}
+
 	function get_current_location() {
-		// show spinner while location loads
-		// $("#loading-spinner-location").show();
-		// $("#current-location-btn i").hide();
-		$("#search-input-location").val("Getting current location...")
+		$("#search-input-location").val("Getting current location...");
 
 		if (navigator.geolocation) {
 			navigator.geolocation.getCurrentPosition(function (position) {
 			    var lat = position.coords.latitude;
 			    var lng = position.coords.longitude;
-			    $("#search-input-location").val(lat + ", " + lng);
+
+			    // get address info from coordinates
+			    var parsed_data = reverse_geocode(lat + "," + lng, show_current_location);
 			});
 		}
+	}
+
+	function show_current_location(data) {
+		var zip = data["zipcode"];
+		var address = data["address"];
+
+	    $("#search-input-location").val(address);	// put full address info in location input
+	    $("#current-zip").html(zip);					// put zip in nav
 	}
 
 	// checks for empty inputs

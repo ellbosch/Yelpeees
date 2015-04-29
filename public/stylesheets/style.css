@@ -32,35 +32,7 @@ body {
 
 /* SEARCH */
 
-/*#search-box {
-  display: inline-block;
-  width: 100px;
-  vertical-align: middle;
-}
-
-#search-box #search-btn {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-#search-box i {
-  padding: 0 5px;
-}
-
-#search-box #search-btn {
-  background-color: #fff;
-  border-radius: 4px;
-  border: 1px solid #2E86C1;
-  padding: 8px;
-}
-
-#search-box #search-btn:hover {
-  cursor: pointer;
-}*/
-
 #nav-search-wrapper {
-  width: 230px;
   display: inline-block;
 }
 
@@ -119,6 +91,12 @@ body {
 
 #current-location-div {
   display: inline-block;
+}
+
+#current-location-div #current-zip {
+  color: #fff;
+  padding: 0 10px;
+  font-style: italic;
 }
 
 #current-location-btn {
@@ -244,10 +222,6 @@ body {
 @media (min-width : 590px) {
   #navbar-title {
     margin: 0 20px;
-  }
-
-  #nav-search-wrapper {
-    width: 430px;
   }
 
   #restaurant-search-wrapper {

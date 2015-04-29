@@ -44,6 +44,19 @@ var within10miles = function (lat1, long1, lat2, long2) {
 	});
 }
 
+exports.getZipcode = function(req, res) {
+	var coords = req.body.coords;
+
+	gm.reverseGeocode(coords, function(err, data){
+		if (err) {
+			throw err;
+		}
+	  	var zip = data.results[0].address_components[8].long_name;
+	  	var ad = data.results[0].formatted_address;
+	  	res.send(JSON.stringify({zipcode: zip, address: ad}));
+	});
+}
+
  exports.getReviews = function (req, res) {
 	oracledb.getConnection(oracleConnectInfo, function(err, connection) {
 		if (err) {
