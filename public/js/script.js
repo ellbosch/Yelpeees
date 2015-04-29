@@ -4,8 +4,12 @@ $(function(){
 	// find current location
 	get_current_location();
 
-
 	function get_current_location() {
+		// show spinner while location loads
+		// $("#loading-spinner-location").show();
+		// $("#current-location-btn i").hide();
+		$("#search-input-location").val("Getting current location...")
+
 		if (navigator.geolocation) {
 			navigator.geolocation.getCurrentPosition(function (position) {
 			    var lat = position.coords.latitude;
@@ -83,6 +87,8 @@ $(function(){
 	$("#search-box #search-btn").on('click', function() {
 		$("#search-fields-div").toggle();
 	});
+
+	$("#current-location-btn").on('click', get_current_location);
 
 	// event handler for when a search is made
 	$("#search-input-btn").on('click', function(event) {
