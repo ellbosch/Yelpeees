@@ -33,16 +33,84 @@ exports.populateSearchResults = function(req, res) {
 	}
 }
 
-var within10miles = function (lat1, long1, lat2, long2) {
-	gm.distance(lat1 + "," + long1, lat2 + "," + long2, function(err, data) {
+function getCloseBusinesses(rows, location, callback) {
+	var result = [];
+	var count = 0;
+	var check = rows.length;
+	for (var i = 0; i < rows.length; i++) {
+		(function(row) {
+			within10Miles(rows[row], location, function(err, isClose) {
+				if (err) {
+					console.log(err);
+					callback(err, null);
+				} else {
+					if (isClose) {
+						result.push(rows[row]);
+						if (row == rows.length - 1) {
+							callback(null, result);
+						}
+					} else {
+						if (row == rows.length - 1) {
+						callback(null, result);
+						}
+					}
+				}
+			});
+		})(i);
+	}
+}
+
+function within10Miles(row, loc2, callback) {
+	var loc1 = row[3] + ", " + row[4];
+	gm.distance(loc1, loc2, function(err, distanceData) {
 		if (err) {
-			throw err;
-		}
-		if(parseFloat(data.rows[0].elements[0].distance.text.split(" ")[0]) < 16.0934) {
-			// within 10 miles
+			callback(err, null);
+		} else {
+			if (!distanceData || distanceData.rows[0].elements[0].status != "OK") {
+				callback(null, false);
+			} else {
+				// TEMPORARY 1000 mile radius until db fully loaded
+				callback(null, parseFloat(distanceData.rows[0].elements[0].distance.text.split(" ")[0].replace(/,/g, '')) < 1609.34);
+			}
 		}
 	});
 }
+
+exports.getBusinesses = function (req, res) {
+	console.log("getting businesses");
+	var bizName = req.body.restaurant;
+	var location = req.body.location;
+	console.log("name: " + bizName + " location: " + location);
+	oracledb.getConnection(oracleConnectInfo, function(err, connection) {
+		if (err) {
+			console.log(err.stack);
+		} else {
+			var sqlBizName = "'%" + bizName.toLowerCase() + "%'";
+			connection.execute("SELECT * "
+				+			   "FROM businesses B "
+				+              "WHERE LOWER(B.name) LIKE " + sqlBizName, function(err, result) {
+
+				if (err) {
+					console.log("error fetching matching business query");
+					res.send({success:false});
+				}	else {
+					var rows = result.rows;
+					getCloseBusinesses(rows, location, function(err, closeOnes) {
+						if (err) {
+							console.log(err);
+						} else {
+							console.log(closeOnes);
+							res.send({success:true, businesses:closeOnes.slice(0, Math.min(10, closeOnes.length - 1))});
+						}
+					});
+				}
+
+			});
+		}
+	});
+}
+
+
 
  exports.getReviews = function (req, res) {
 	oracledb.getConnection(oracleConnectInfo, function(err, connection) {
@@ -78,11 +146,14 @@ var within10miles = function (lat1, long1, lat2, long2) {
 					var reviewSet = [];
 					var result = [];
 					var i, j, count = 0;
+					console.log("starting to search the reviews");
 					while (i < reviews.length && j < tips.length) {
+						console.log("populating results");
 						var name = reviews[i].NAME;
 						var address = reviews[i].ADDRESS;
 						count = 0;
 						while (reviews[i].BUSINESS_ID == firstId) {
+							console.log("looping through reviews");
 							reviewSet.push(reviews[i].TEXT);
 							i++;
 							count++;
@@ -99,7 +170,6 @@ var within10miles = function (lat1, long1, lat2, long2) {
 							firstId = reviews[i].BUSINESS_ID;
 						}
 					}	
-					console.log(result);
 					
 					connection.release(function(err) {
 						if (err) {

@@ -15,6 +15,26 @@ $(function(){
 		}
 	}
 
+	// FOR ELLA'S TESTIN PURPOSES
+
+	function search_businesses() {
+	$.ajax({
+				async: true,
+				url: "/searchBusinesses",
+				type: "POST",
+				data: {
+						"restaurant":  "domino",
+						"location": "39.952117099999995, -75.20109599999999"
+					},
+					success: function(data) {
+						console.log(data);
+					},
+					error: function (xhr, ajaxOptions, thrownError) {
+						console.log("error");
+					}
+			});
+	}
+
 	// checks for empty inputs
 	function check_for_valid_inputs($form) {
 		var is_valid = true;				// return true if all inputs have strings
