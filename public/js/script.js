@@ -4,13 +4,56 @@ $(function(){
 	// find current location
 	get_current_location();
 
+	// convert address into coordinates
+	function geocode(address, cb) {
+		$.ajax({
+			async: true,
+			url: "/geocode",
+			type: "POST",
+			dataType: "json",
+			data: {
+					"address": address
+				},
+				success: function(data) {
+					cb(data.lat + "," + data.lng, data.zipcode);
+				},
+				error: function (xhr, ajaxOptions, thrownError) {
+					// console.log("error");
+				}
+		});
+	}
+
+	// convert coordinates to address info
+	function reverse_geocode(coords, show_current_location) {
+		$.ajax({
+			async: true,
+			url: "/reverse_geocode",
+			type: "POST",
+			dataType: "json",
+			data: {
+					"coords": coords
+				},
+				success: function(data) {
+					parsed_data = data;
+					show_current_location(data);
+				},
+				error: function (xhr, ajaxOptions, thrownError) {
+					// console.log("error");
+				}
+		});
+	}
 
 	function get_current_location() {
+		$("#search-input-location").val("Getting current location...");
+		$("#search-input-location").prop("disabled", true);
+
 		if (navigator.geolocation) {
 			navigator.geolocation.getCurrentPosition(function (position) {
 			    var lat = position.coords.latitude;
 			    var lng = position.coords.longitude;
-			    $("#search-input-location").val(lat + ", " + lng);
+
+			    // get address info from coordinates
+			    reverse_geocode(lat + "," + lng, show_current_location);
 			});
 		}
 	}
@@ -33,6 +76,15 @@ $(function(){
 						console.log("error");
 					}
 			});
+		}
+
+	function show_current_location(data) {
+		var zip = data["zipcode"];
+		var address = data["address"];
+
+	    $("#search-input-location").val(address);			// put full address info in location input
+	    $("#current-zip").html(zip);						// put zip in nav
+		$("#search-input-location").prop("disabled", false);// re-enable location input
 	}
 
 	// checks for empty inputs
@@ -62,7 +114,7 @@ $(function(){
 	// displays food review data
 	function display_food_data(food_input, data, sentiment_rating) {
 		$("#loading-screen").hide();		// hide loading screen
-		$("#food-item-div").show();			// show food-item-div if it is not already showing
+		$("#wrapper-result").show();			// show food-item-div if it is not already showing
 
 		var restaurant_name = data[0]["NAME"];
 		var food_input_cap = food_input.charAt(0).toUpperCase() + food_input.substring(1);
@@ -93,135 +145,86 @@ $(function(){
 	// cancels query
 	function cancel_query() {
 		$("#loading-screen").hide();
-		$("#food-item-div").hide();
+		$("#wrapper-result").hide();
 		jqXHR.abort();
 	}
 	
 
 	// show search inputs when search button is clicked
-	$("#search-box #search-btn").on('click', function() {
-		$("#search-fields-div").toggle();
+	$("#current-location-div a").on('click', function() {
+		$("#edit-location-div").toggle();
 	});
+
+	// event handler for getting current location
+	$("#current-location-btn").on('click', get_current_location);
+
+	// event handler for saving custom location
+	$("#location-input-btn").on('click', function(e) {
+		e.preventDefault();
+
+		// check if input is valid
+		var is_valid = check_for_valid_inputs($("#edit-location-div form"));
+
+		if (is_valid) {
+			var address = $("#search-input-location").val();
+			geocode(address, function(coords, zip) {
+				// DO SOMETHING WITH COORDS
+
+				$("#current-zip").html(zip);
+			});
+			$("#edit-location-div").hide();
+		}
+	})
 
 	// event handler for when a search is made
-	$("#search-input-btn").on('click', function(event) {
-		event.preventDefault();
-		var is_valid = check_for_valid_inputs($("#search-fields-div form"));
+	// $("#search-input-btn").on('click', function(event) {
+	// 	event.preventDefault();
+	// 	var is_valid = check_for_valid_inputs($("#edit-restaurant-div form"));
+	// 	$("#error-div").hide();
 
-		// below only executes if all inputs have entries
-		if (is_valid) {
-			$("#loading-screen").show();	// show loading screen
-			$("#search-fields-div").hide();	// hide search field divs
+	// 	// below only executes if all inputs have entries
+	// 	if (is_valid) {
+	// 		$("#loading-screen").show();	// show loading screen
+	// 		$("#edit-restaurant-div").hide();	// hide search field divs
 
-			var food_input = $("#search-input-food").val().trim();
-			var restaurant_input = $("#search-input-restaurant").val().trim();
-			var location_input = $("#search-input-location").val().trim();
+	// 		var food_input = $("#search-input-food").val().trim();
+	// 		var restaurant_input = $("#search-input-restaurant").val().trim();
+	// 		var location_input = $("#search-input-location").val().trim();
 
-			jqXHR = $.ajax({
-				async: true,
-				url: "/search",
-				type: "POST",
-				data: {
-						"food": food_input, 
-						"restaurant":  restaurant_input,
-						"location": location_input
-					},
-					success: function(data) {
-						$("#reviews-div").html("");		// hide old review data
-						var data_parsed = JSON.parse(data);
-						var data_result = data_parsed["data"];
-						var sentiment_result = data_parsed["sentiment"];
-						var reviews_result = JSON.parse(data_result);
+	// 		jqXHR = $.ajax({
+	// 			async: true,
+	// 			url: "/search",
+	// 			type: "POST",
+	// 			data: {
+	// 					"food": food_input, 
+	// 					"restaurant":  restaurant_input,
+	// 					"location": location_input
+	// 				},
+	// 				success: function(data) {
+	// 					$("#reviews-div").html("");		// hide old review data
+	// 					var data_parsed = JSON.parse(data);
+	// 					var data_result = data_parsed["data"];
+	// 					var sentiment_result = data_parsed["sentiment"];
+	// 					var reviews_result = JSON.parse(data_result);
 
-						console.log(reviews_result);
-
-						if (reviews_result.length == 0) {
-							cancel_query();
-							// show error message when no reviews are returned from query
-							$("#reviews-div").html("<div class='alert alert-warning' role='alert'>No reviews found!</div>")
-						} else {
-							// display food data
-							display_food_data(food_input, reviews_result, parseFloat(sentiment_result["avg"]));
-						}
-					},
-					error: function (xhr, ajaxOptions, thrownError) {
-						// console.log("error");
-					}
-			});
-		}
-	});
+	// 					if (reviews_result.length == 0) {
+	// 						cancel_query();
+	// 						// show error message when no reviews are returned from query
+	// 						$("#error-div").show();
+	// 					} else {
+	// 						// display food data
+	// 						display_food_data(food_input, reviews_result, parseFloat(sentiment_result["avg"]));
+	// 					}
+	// 				},
+	// 				error: function (xhr, ajaxOptions, thrownError) {
+	// 					// console.log("error");
+	// 				}
+	// 		});
+	// 	}
+	// });
 
 	// event handler for canceling loads
 	$("#cancel-load").on('click', function() {
 		cancel_query();	
 	});
-
-
-// 	$("#Search").click(function() {
-// 		$("#error").html("");
-// 		var lat;
-// 		var lng;
-// 		if (navigator.geolocation) {
-// 			navigator.geolocation.getCurrentPosition(function (position) {
-// 			    lat = position.coords.latitude;
-// 			    lng = position.coords.longitude;
-
-// 			    if ($("input[name='food']").val().trim() == "") {
-// 					$("#error").html("Empty Food Field");
-// 				}
-// 				else {
-// 					$.ajax({
-// 						async: true,
-// 						url: "/search",
-// 						type: "POST",
-// 						data: 
-// 							( $("input[name='location']").val().trim() == "" ? 
-// 								{
-// 									"food": $("input[name='food']").val(), 
-// 									"restaurant":  $("input[name='restaurant']").val(),
-// 									"location": lat + "," + lng
-// 								} :
-// 								{
-// 									"food": $("input[name='food']").val(), 
-// 									"restaurant":  $("input[name='restaurant']").val(),
-// 									"location": $("input[name='location']").val()
-// 								}
-// 							)
-// 					});
-// 				}
-// 			});
-// 		}
-// 		else {
-// 			if ($("input[name='food']").val().trim() == "") {
-// 				$("#error").html("Empty Food Field");
-// 			}
-// 			else if ($("input[name='location']").val().trim() == "") {
-// 				$("#error").html("Empty Location Field");
-// 			}
-// 			else {
-// 				$.ajax({
-// 					async: true,
-// 					url: "/search",
-// 					type: "POST",
-// 					data: 
-// 						{
-// 							"food": $("input[name='food']").val(), 
-// 							"restaurant":  $("input[name='restaurant']").val(),
-// 							"location": $("input[name='location'])").val()
-// 						}
-	// 			});
-	// 		}
-	// 	}
-		
-	// });
-	
-
-	// sentiment analysis
-	function run_sentiment_analysis(text) {
-		$.post("/sentiment", {'text': text}, function(data, status) {
-			if (data.success) {
-				score = data['result']['score'];
-			}
-		});
-	}
 })

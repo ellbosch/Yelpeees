@@ -23,12 +23,30 @@
 	    		<div id="navbar-title"><span>Yelpeees</span></div>
 
 	    		<!-- SEARCH BOX -->
-	    		<div id="search-box">
+	    		<!-- <div id="search-box">
 		    		<div id="search-btn">
 		    			<i class="fa fa-search"></i>
 		    			<span id="search-btn-query">Search</span>
 	    			</div>
-				</div>
+				</div> -->
+
+				<div id="nav-search-wrapper">
+					<div id="restaurant-search-wrapper">
+						<!-- RESTAURANT SEARCH -->
+						<div id="restaurant-search-div" class="input-group">
+					    	<input type="text" class="form-control" placeholder="Search for restaurant">
+					    	<span class="input-group-btn">
+					        	<button class="btn btn-default" id="search-input-btn" type="button"><i class="fa fa-search"></i></button>
+					    	</span>
+				    	</div>
+			    	</div>
+
+			    	<!-- CURRENT LOCATION BUTTON -->
+			    	<div id="current-location-div">
+			    		<span id="current-zip"></span>
+			    		<a>Edit Location</a>
+	    			</div>
+		    	</div>
 
 				<!-- MENU ITEMS -->
 		    	<ul id="menu">
@@ -38,29 +56,21 @@
 		    	</ul>
 		    </div>
 
-		    <div id="search-fields-div">
+		    <div id="edit-location-div">
 		    	<form class="form-horizontal">
-			    	<div class="form-group">
+			    	<div class="form-group" id="location-input-wrapper">
 		    			<label for="search-food-input" class="col-sm-1 control-label">Location</label>
 		    			<div class="col-sm-5">
-			    			<input type="text" class="form-control" id="search-input-location" placeholder="Location">
+			    			<input type="text" class="form-control" id="search-input-location" 
+			    			placeholder="Type in your location or press the get location button">
 		    			</div>
-		    		</div>
-		    		<div class="form-group">
-		    			<label for="search-food-input" class="col-sm-1 control-label">Food</label>
-		    			<div class="col-sm-5">
-			    			<input type="text" class="form-control" id="search-input-food" placeholder="Food">
-		    			</div>
-		    		</div>
-		    		<div class="form-group">
-		    			<label for="search-input-restaurant" class="col-sm-1 control-label">Place</label>
-		    			<div class="col-sm-5">
-		    				<input type="text" class="form-control" id="search-input-restaurant" placeholder="Restaurant, food truck, or other food venue">
+		    			<div id="current-location-btn" title="Get current location">
+			    			<i class="fa fa-location-arrow"></i>
 		    			</div>
 		    		</div>
 		    		<div class="form-group">
 		    			<div class="col-sm-offset-1">
-		    				<button type="submit" class="btn btn-default" id="search-input-btn">Search</button>
+		    				<button type="submit" class="btn btn-default" id="location-input-btn">Save</button>
 		    			</div>
 		    		</div>
 		    	</form>
@@ -68,24 +78,28 @@
 	    </div>
 
 	    <div class="container-fluid" id="container-div">
+
+		    <!-- ERROR MESSAGE -->
+	    	<div id="error-div">
+		    	<div class='alert alert-warning' role='alert'>No reviews found!</div>
+	    	</div>
 		    
 		    <!-- RESULT DIV -->
 		    <div class="container-fluid" id="wrapper-result">
 				<!-- HEADER AND RATING -->
 				<div id="food-item-div">
-					<span id="food-item-header">TACOS</span>
+					<span id="food-item-header"></span>
 					<div id="progress-div">
 						<div class="progress">
 							<div class="progress-bar progress-bar-success" style="width: 65%"></div>
 							<div class="progress-bar progress-bar-danger" style="width: 35%"></div>
 						</div>
-						<span id="rating-span"><span id="sentiment-rating">65</span>% rating from <span id="num-reviews"></span> reviews</span>
+						<span id="rating-span"><span id="sentiment-rating"></span>% rating from <span id="num-reviews"></span> reviews</span>
 					</div>
 				</div>
 
 				<!-- REVIEWS -->
 				<div id="reviews-div"></div>
-
 		    </div>
 		</div>
 

@@ -32,6 +32,8 @@ routes.init(function() {
 	app.post('/search', routes.getReviews);
 	app.post('/searchBusinesses', routes.getBusinesses);
 	app.get('/search_results', routes.populateSearchResults);
+	app.post('/reverse_geocode', routes.getReverseGeocode);
+	app.post('/geocode', routes.getGeocode);
 	/////////////////////
 
 	app.post('/sentiment', routes.sentiment_analysis);
