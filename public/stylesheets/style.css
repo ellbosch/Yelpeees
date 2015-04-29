@@ -73,19 +73,19 @@ body {
   cursor: pointer;
 }
 
-#edit-restaurant-div {
+#edit-location-div {
   display: none;
   width: 100%;
   border-top: 1px solid #2E86C1;
 }
 
-#edit-restaurant-div form {
+#edit-location-div form {
   margin-left: 11px;
   margin-top: 10px;
   color: #fff;
 }
 
-#edit-restaurant-div form input, #edit-restaurant-div form button {
+#edit-location-div form input, #edit-location-div form button {
   border: 1px solid #2E86C1;
 }
 
@@ -117,9 +117,12 @@ body {
   color: #f39c12;
 }
 
-#loading-spinner-location {
-  margin-left: 5px;
-  display: none;
+#location-input-wrapper {
+  margin-bottom: 5px;
+}
+
+#location-input-btn {
+  margin-left: 15px;
 }
 
 

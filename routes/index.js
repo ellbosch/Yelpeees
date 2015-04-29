@@ -44,20 +44,46 @@ var within10miles = function (lat1, long1, lat2, long2) {
 	});
 }
 
-exports.getZipcode = function(req, res) {
+exports.getReverseGeocode = function(req, res) {
 	var coords = req.body.coords;
 
 	gm.reverseGeocode(coords, function(err, data){
 		if (err) {
 			throw err;
 		}
-	  	var zip = data.results[0].address_components[8].long_name;
 	  	var ad = data.results[0].formatted_address;
+	  	var zip = get_zipcode(ad);
 	  	res.send(JSON.stringify({zipcode: zip, address: ad}));
 	});
 }
 
- exports.getReviews = function (req, res) {
+// get zipcode from address
+function get_zipcode(ad) {
+	var zip = "";
+	var ad_split = ad.split(" ");
+  	if (ad_split.length > 2) {
+	  	var zip_untrim = ad_split[ad_split.length - 2];
+	  	if (zip_untrim.length == 6) {
+		  	zip = zip_untrim.substring(0, zip_untrim.length - 1);
+		}
+	}
+	return zip;
+}
+
+exports.getGeocode = function(req, res) {
+	var address = req.body.address;
+
+	gm.geocode(address, function(err, data){
+		if (err) {
+			throw err;
+		}
+		var location = data.results[0].geometry.location;
+		var zip = get_zipcode(data.results[0].formatted_address);
+		res.send(JSON.stringify({lat: location.lat, lng: location.lng, zipcode: zip}));
+	});
+}
+
+exports.getReviews = function (req, res) {
 	oracledb.getConnection(oracleConnectInfo, function(err, connection) {
 		if (err) {
 			console.log(err.stack);
