@@ -110,11 +110,6 @@ exports.getBusinesses = function (req, res) {
 	});
 }
 
-<<<<<<< HEAD
-
-
- exports.getReviews = function (req, res) {
-=======
 exports.getReverseGeocode = function(req, res) {
 	var coords = req.body.coords;
 
@@ -155,7 +150,6 @@ exports.getGeocode = function(req, res) {
 }
 
 exports.getReviews = function (req, res) {
->>>>>>> 3cdddc2a288d822032ce7b65a758f02be2479b43
 	oracledb.getConnection(oracleConnectInfo, function(err, connection) {
 		if (err) {
 			console.log(err.stack);
