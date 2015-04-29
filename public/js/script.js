@@ -78,14 +78,14 @@ $(function(){
 	function cancel_query() {
 		$("#loading-screen").hide();
 		$("#wrapper-result").hide();
-		$("#search-fields-div").show();
+		$("#edit-restaurant-div").show();
 		jqXHR.abort();
 	}
 	
 
 	// show search inputs when search button is clicked
-	$("#search-box #search-btn").on('click', function() {
-		$("#search-fields-div").toggle();
+	$("#current-location-div a").on('click', function() {
+		$("#edit-restaurant-div").toggle();
 	});
 
 	$("#current-location-btn").on('click', get_current_location);
@@ -93,13 +93,13 @@ $(function(){
 	// event handler for when a search is made
 	$("#search-input-btn").on('click', function(event) {
 		event.preventDefault();
-		var is_valid = check_for_valid_inputs($("#search-fields-div form"));
+		var is_valid = check_for_valid_inputs($("#edit-restaurant-div form"));
 		$("#error-div").hide();
 
 		// below only executes if all inputs have entries
 		if (is_valid) {
 			$("#loading-screen").show();	// show loading screen
-			$("#search-fields-div").hide();	// hide search field divs
+			$("#edit-restaurant-div").hide();	// hide search field divs
 
 			var food_input = $("#search-input-food").val().trim();
 			var restaurant_input = $("#search-input-restaurant").val().trim();
@@ -120,8 +120,6 @@ $(function(){
 						var data_result = data_parsed["data"];
 						var sentiment_result = data_parsed["sentiment"];
 						var reviews_result = JSON.parse(data_result);
-
-						console.log(reviews_result);
 
 						if (reviews_result.length == 0) {
 							cancel_query();
