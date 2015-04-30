@@ -10,6 +10,36 @@ var crypto = require('crypto');
 
 // // We export the init() function to initialize
 // // our KVS values
+
+
+function analyzeReview(review, searchTerm){
+	var n=0, pos=0, sumSentiments = 0.0;
+    var step = searchTerm.length;
+    var length = review.length;
+
+    while(true){
+        pos = review.indexOf(searchTerm,pos);
+        if (pos >= 0) { 
+        	var lowPos = Math.min(0, pos - 30);
+        	lowPos = (review.indexOf(" ", Math.max(0, pos-30))) 
+        	var highPos = Math.min(length - 1, pos + 30);
+        	var nextSpace = review.indexOf(" ", highPos);
+        	if (nextSpace != -1) {
+        		highPos = nextSpace;
+        	}
+        	var pSentiment = sentiment(review.substring(lowPos, highPos));
+        	sumSentiments += parseFloat(pSentiment.score);
+            n++; 
+        	pos+=step; 
+        } else break;
+    }
+    console.log("sum sentiments: " + sumSentiments);
+    console.log("n: " + n);
+    console.log("average sentiment: " + sumSentiments/n);
+    var avg = (n == 0) ? 0 : sumSentiments/n;
+    return avg;
+}
+
 exports.init = function(callback) {
 	callback();
 };
@@ -24,50 +54,6 @@ exports.login = function(req, res) {
 
 exports.signup = function(req, res) {
 	res.render('signup', {error: ""});
-}
-
-exports.validateUser = function(req, res) {
-	if (req.body.username && req.body.password) {
-		var username = req.body.username;
-		oracledb.getConnection(oracleConnectInfo, function(err, connection) {
-			if (err) {
-				console.log(err.stack);
-				res.render("login", {error: "Error connecting to the database. Sorry, please try again"});
-				return;
-			}
-			connection.execute("SELECT *"
-					+		   "FROM users U "
-					+          "WHERE U.username = :username", ["'" + req.body.username + "'"], function(err, result) {
-				if (err) {
-					console.log("error fetching username count from users table: createAccount()");
-					res.render("login", {error: "Error connecting to the database. Sorry, please try again"});
-					return;
-				}	
-
-				if (result.rows.length == 0) {
-					res.render("login", {error: "Invalid username"});
-					return;
-				}
-				var encrypter = crypto.createHash('sha1');
-				encrypter.update(req.body.password);
-				var encrypted_password = encrypter.digest('base64');
-				if (result.rows[0][1] == "'" + encrypted_password + "'") {
-					req.session.username = username;
-					req.session.userid = result.rows[0][5];
-					res.redirect("/");
-					return;
-				}
-				else {
-					res.render("login", {error: "Invalid password"});
-					return;
-				}
-			});
-		});
-	}
-	else {
-		res.render("login", {error: "Empty fields presents. Please make sure to fill out all the fields"});
-		return;
-	}
 }
 
 exports.createAccount = function(req, res) {
@@ -255,7 +241,7 @@ exports.getReviewsAndRating = function (req, res) {
 		var sqlFood = "'%" + food.toLowerCase() + "%'";
 		//var userId = req.session.userid;
 		var userId = 1;
-		updateUserHistory(userId, restaurantId, food, function(err, success) {
+		updateUserHistory(connection, userId, restaurantId, food, function(err, success) {
 			if (err) {
 				console.log(err);
 				res.send({success:false, message: "Error updating user history. Please try again"});
@@ -398,51 +384,15 @@ exports.signup = function(req, res) {
 	res.render('signup', {error: ""});
 }
 
-function analyzeReview(review, searchTerm){
-	var n=0, pos=0, sumSentiments = 0.0;
-    var step = searchTerm.length;
-    var length = review.length;
 
-    while(true){
-        pos = review.indexOf(searchTerm,pos);
-        if (pos >= 0) { 
-        	var lowPos = Math.min(0, pos - 30);
-        	lowPos = (review.indexOf(" ", Math.max(0, pos-30))) 
-        	var highPos = Math.min(length - 1, pos + 30);
-        	var nextSpace = review.indexOf(" ", highPos);
-        	if (nextSpace != -1) {
-        		highPos = nextSpace;
-        	}
-        	var pSentiment = sentiment(review.substring(lowPos, highPos));
-        	sumSentiments += parseFloat(pSentiment.score);
-            n++; 
-        	pos+=step; 
-        } else break;
-    }
-    console.log("sum sentiments: " + sumSentiments);
-    console.log("n: " + n);
-    console.log("average sentiment: " + sumSentiments/n);
-    var avg = (n == 0) ? 0 : sumSentiments/n;
-    return avg;
-}
-
-
-function updateUserHistory(userId, businessId, food, callback) {
-	oracledb.getConnection(oracleConnectInfo, function(err, connection) {
+function updateUserHistory(connection, userId, businessId, food, callback) {
+	connection.execute("INSERT INTO history VALUES (:userid, :food_item, :business_id)",
+						[userId, food, businessId], {isAutoCommit: true}, function(err, result) {
 		if (err) {
-			console.log(err.stack);
+			console.log("error updating user history");
 			callback(err, null);
-		} else {
-			connection.execute("INSERT INTO history (userid, food_item, business_id) "
-						+ 		"VALUES ('" + userId + "', '" + food + "', '" + businessId + "')" 
-							, function(err, result) {
-				if (err) {
-					callback(err, null);
-				}	else {
-					callback(null, {success:true});
-				}				
-
-			});
+		}	else {
+			callback(null, {success:true});
 		}
 	});
 }
