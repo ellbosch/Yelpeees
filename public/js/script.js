@@ -65,38 +65,72 @@ $(function() {
 	}
 
 	function search_businesses() {
-	$.ajax({
-				async: true,
-				url: "/searchBusinesses",
-				type: "POST",
-				data: {
-						"restaurant":  "McDonald's",
-						"location": "39.952117099999995, -75.20109599999999"
-					},
-					success: function(data) {
-						console.log(data);
-					},
-					error: function (xhr, ajaxOptions, thrownError) {
-						console.log("error");
-					}
-			});
-		}
+		$.ajax({
+			async: true,
+			url: "/searchBusinesses",
+			type: "POST",
+			data: {
+					"restaurant":  "McDonald's",
+					"location": "39.952117099999995, -75.20109599999999"
+				},
+				success: function(data) {
+					console.log(data);
+				},
+				error: function (xhr, ajaxOptions, thrownError) {
+					console.log("error");
+				}
+		});
+	}
 
 	function search_reviews(business_id, food_input) {
 		$.ajax({
 			async: true,
 			url: "/search",
 			type: "POST",
+			dataType: "json",
 			data: {
 				"businessId":  business_id,
 				"food": food_input
 			}, success: function(data) {
-					console.log(data);
+				if (data.success) {
+					var parsed_data = JSON.parse(data.data)
+					var reviews = parsed_data["reviews"];
+					var sentiment = parsed_data["sentiment"]["avg"];
+					display_review_data(food_input, reviews, sentiment);
+				} else {
+					// TODO
+				}
 			}, error: function (xhr, ajaxOptions, thrownError) {
 					console.log("error");
-				}
-			});
+			}
+		});
+	}
+
+	// displays food review data
+	function display_review_data(food_input, reviews, sentiment_rating) {
+		$("#loading-screen").hide();		// hide loading screen
+		$("#food-rating-div").show();			// show food-item-div if it is not already showing
+		$("#reviews-div").show();
+
+		var food_input_cap = food_input.charAt(0).toUpperCase() + food_input.substring(1);
+		var rating = Math.round(sentiment_rating/12 * 100);
+
+		// set text to header
+		$("#food-item-header").html(food_input.toUpperCase());
+
+		// show rating
+		$("#progress-div .progress-bar-success").width(rating + "%");
+		$("#progress-div .progress-bar-danger").width((100-rating) + "%");
+		$("#sentiment-rating").html(rating);	// show rating percentage
+		$("#num-reviews").html(reviews.length);	// show number of reviews
+
+		// show new yelp reviews
+		var review_html = "";
+		for (r in reviews) {
+			review_html = review_html + "<div class='review'><p>" + r + "</p></div>"
 		}
+		$("#reviews-text-div").html(review_html);
+	}
 
 	// convert address into coordinates
 	function getHistory() {
@@ -177,6 +211,10 @@ $(function() {
 	function display_business_data(data) {
 		$("#loading-screen").hide();
 		$("#restaurant-results-div").show();
+		$("#picked-restaurant-div").hide();
+		$("#food-rating-div").hide();
+		$("#reviews-div").hide();
+		$("#restaurant-results-div").html("<h4>Select Your Restaurant:</h4>");
 
 		for (var i = 0; i < data.length; i++) {
 			var id = data[i][0];
@@ -191,37 +229,6 @@ $(function() {
 							+ "</div></div>"
 			$("#restaurant-results-div").append(str);
 		}
-	}
-
-	// displays food review data
-	function display_food_data(food_input, data, sentiment_rating) {
-		$("#loading-screen").hide();		// hide loading screen
-		$("#wrapper-result").show();			// show food-item-div if it is not already showing
-
-		var restaurant_name = data[0]["NAME"];
-		var food_input_cap = food_input.charAt(0).toUpperCase() + food_input.substring(1);
-		var rating = Math.round(sentiment_rating/12 * 100);
-
-		// set text to search button
-		var btn_str = "<strong>" + food_input_cap + "</strong> at <strong>" + restaurant_name + "</strong>"
-		$("#search-btn-query").html(btn_str);
-
-		// set text to header
-		$("#food-item-header").html(food_input.toUpperCase());
-
-		// show rating
-		$("#progress-div .progress-bar-success").width(rating + "%");
-		$("#progress-div .progress-bar-danger").width((100-rating) + "%");
-		$("#sentiment-rating").html(rating);	// show rating percentage
-		$("#num-reviews").html(data.length);	// show number of reviews
-
-		// show new yelp reviews
-		var review_html = "";
-		for (var i = 0; i < data.length; i++) {
-			var review = data[i];
-			review_html = review_html + "<div class='review'><p>" + review["TEXT"] + "</p></div>"
-		}
-		$("#reviews-div").html(review_html);
 	}
 
 	// ensures valid location
@@ -299,7 +306,6 @@ $(function() {
 	// event handler for selecting a restaurant
 	$("#wrapper-result #restaurant-results-div").on('click', ".restaurant-result", function() {
 		var business_id = $(this).attr("data-id");
-		console.log(business_id);
 		var business_name = $(this).find(".restaurant-name").text();
 		var addr_1 = $(this).find(".restaurant-address p:first-child").text();
 		var addr_2 = $(this).find(".restaurant-address p:nth-child(2)").text();
@@ -316,7 +322,10 @@ $(function() {
 	// event handler for searching for food
 	$("#search-food-input").keypress(function(e) {
 		if(e.which == 13) {
-			// $("#")
+			$("#loading-screen").show();
+			var business_id = $("#restaurant-info-div").attr("data-id");
+			var food_input = $(this).val();
+			search_reviews(business_id, food_input);
 		}
 	})
 

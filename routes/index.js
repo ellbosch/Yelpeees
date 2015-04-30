@@ -409,30 +409,34 @@ exports.signup = function(req, res) {
 
 
 function updateUserHistory(connection, userId, businessId, food, callback) {
-	connection.execute("SELECT name FROM businesses WHERE business_id = " + "'" + businessId + "'", function(err, result) {
-		if (err) {
-			console.log(err);
-			callback(err, null);
-		} else {
-			var rows = result.rows;
-			if (rows.length == 1) {
-				var name = rows[0][0];
-				var time = (new Date).getTime();				
-				connection.execute("INSERT INTO history VALUES (:userid, :food_item, :business_id, :name, :time)",
-						[userId, food, businessId, name, time], {isAutoCommit: true}, function(err, result) {
-					if (err) {
-						console.log("error updating user history");
-						callback(err, null);
-					}	else {
-						callback(null, {success:true});
-					}
-				});
+	if (!userId) {
+		callback(null, {success:true});
+	} else {
+		connection.execute("SELECT name FROM businesses WHERE business_id = " + "'" + businessId + "'", function(err, result) {
+			if (err) {
+				console.log(err);
+				callback(err, null);
 			} else {
-				console.log("no business name");
-				callback(1, null);
+				var rows = result.rows;
+				if (rows.length == 1) {
+					var name = rows[0][0];
+					var time = (new Date).getTime();				
+					connection.execute("INSERT INTO history VALUES (:userid, :food_item, :business_id, :name, :time)",
+							[userId, food, businessId, name, time], {isAutoCommit: true}, function(err, result) {
+						if (err) {
+							console.log("error updating user history");
+							callback(err, null);
+						}	else {
+							callback(null, {success:true});
+						}
+					});
+				} else {
+					console.log("no business name");
+					callback(1, null);
+				}
 			}
-		}
-	});
+		});
+	}
 }
 
 exports.validateUser = function(req, res) {

@@ -287,6 +287,10 @@ body {
   border: 0;
 }
 
+#food-rating-div {
+  display: none;
+}
+
 #food-item-header {
   font-weight: bold;
   font-size: 50px;
