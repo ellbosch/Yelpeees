@@ -36,7 +36,7 @@ routes.init(function() {
 	app.get('/login', routes.login);
 	app.get('/signup', routes.signup);
 	/////////////////////
-	
+
 	http.createServer( app ).listen( app.get( 'port' ), function(){
 		console.log( 'Open browser to http://localhost:' + app.get( 'port' ));
 	});

@@ -105,7 +105,7 @@ $(function(){
 
 
 
-
+	search_reviews();
 	function search_reviews() {
 		$.ajax({
 			async: true,
@@ -121,7 +121,6 @@ $(function(){
 				}
 			});
 		}
-
 
 	function show_current_location(data) {
 		var zip = data["zipcode"];
