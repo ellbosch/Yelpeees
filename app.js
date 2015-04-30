@@ -26,17 +26,13 @@ app.use(session({secret: 'mypennkeygoeshere'}));
 
 routes.init(function() {
 	app.get( '/', routes.index );
-	app.get('/example', routes.example);
-	app.post('/example', routes.example);
 	app.post('/search', routes.getReviewsAndRating);
 	app.post('/searchBusinesses', routes.getBusinesses);
 	app.get('/search_results', routes.populateSearchResults);
 	app.post('/reverse_geocode', routes.getReverseGeocode);
 	app.post('/geocode', routes.getGeocode);
 	/////////////////////
-
-	app.post('/sentiment', routes.sentiment_analysis);
-
+	
 	http.createServer( app ).listen( app.get( 'port' ), function(){
 		console.log( 'Open browser to http://localhost:' + app.get( 'port' ));
 	});
