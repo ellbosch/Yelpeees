@@ -85,7 +85,7 @@ $(function(){
 			});
 		}
 
-	//	search_reviews();
+		// search_reviews();
 
 	function search_reviews() {
 		$.ajax({
@@ -94,7 +94,7 @@ $(function(){
 			type: "POST",
 			data: {
 				"businessId":  "OrTArReTvdVxEKBAxsz3Ww",
-				"food": "chicken"
+				"food": "mashed potatoes"
 			}, success: function(data) {
 					console.log(data);
 			}, error: function (xhr, ajaxOptions, thrownError) {

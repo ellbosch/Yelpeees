@@ -33,9 +33,6 @@ function analyzeReview(review, searchTerm){
         	pos+=step; 
         } else break;
     }
-    console.log("sum sentiments: " + sumSentiments);
-    console.log("n: " + n);
-    console.log("average sentiment: " + sumSentiments/n);
     var avg = (n == 0) ? 0 : sumSentiments/n;
     return avg;
 }
@@ -46,7 +43,7 @@ exports.init = function(callback) {
 
 exports.index = function(req, res) {
 	if (req.session.userid) {
-		getHistory(userid, function(err, history) {
+		getHistory(req.session.userid, function(err, history) {
 			if (err) {
 				console.log(err);
 				res.render('index', {loggedIn:true, userName:'', history:[]});
@@ -55,7 +52,7 @@ exports.index = function(req, res) {
 			}
 		});
 	} else {
-		res.render('index', {loggedIn:false, userName:''});
+		res.render('index', {loggedIn:false, userName:'', history: []});
 	}
 }
 
@@ -144,22 +141,15 @@ exports.init = function(callback) {
 	callback();
 };
 
-exports.index = function(req, res) {
-	res.render('index');
-}
-
 exports.getBusinesses = function (req, res) {
 	console.log("getting businesses");
 	var bizName = req.body.restaurant;
 	var location = req.body.location;
-	console.log("name: " + bizName + " location: " + location);
 	oracledb.getConnection(oracleConnectInfo, function(err, connection) {
 		if (err) {
 			console.log(err.stack);
 		} else {
 			var sqlBizName = "'%" + bizName.toLowerCase().replace(/[^\w\s\']/g, '').replace(/'/g, "''") + "%'";
-			console.log(sqlBizName);
-			console.log(bizName.toLowerCase().replace(/[^\w\s]/g, ''));
 			connection.execute("SELECT * "
 				+			   "FROM businesses B "
 				+              "WHERE REGEXP_REPLACE(LOWER(B.name), '/[^\w\s]/g', '') LIKE " + sqlBizName, function(err, result) {
@@ -170,7 +160,6 @@ exports.getBusinesses = function (req, res) {
 					res.send({success:false});
 				}	else {
 					var rows = result.rows;
-					console.log(result.rows);
 					getCloseBusinesses(rows, location, function(err, closeOnes) {
 						if (err) {
 							console.log(err);
@@ -252,8 +241,7 @@ exports.getReviewsAndRating = function (req, res) {
 		var food = req.body.food;
 		var sqlRestaurant = "'" + restaurantId + "'";
 		var sqlFood = "'%" + food.toLowerCase() + "%'";
-		//var userId = req.session.userid;
-		var userId = 1;
+		var userId = req.session.userid;
 		updateUserHistory(connection, userId, restaurantId, food, function(err, success) {
 			if (err) {
 				console.log(err);
@@ -330,10 +318,11 @@ exports.getReviewsAndRating = function (req, res) {
 
 function getHistory(userId, callback) {
 	oracledb.getConnection(oracleConnectInfo, function(err, connection) {
-		connection.execute("SELECT * FROM history H WHERE H.user_id = :uid ORDER BY H.time desc", [userId], function(err, result) {
+		connection.execute("SELECT * FROM history H WHERE H.userid = :userid ORDER BY H.time desc", [userId], function(err, result) {
 			if (err) {
+				console.log("getHistory()");
 				console.log(err);
-				res.send({success:false, message:"Error fetching user history."});
+				callback(err, null);
 			} else {
 				var rows = result.rows;
 				connection.release(function(err) {
@@ -341,7 +330,7 @@ function getHistory(userId, callback) {
 						console.log("error getting history: " + err);
 						callback(err, null);
 					} else {
-						console.log(result.rows);
+						console.log(rows);
 						callback(null, rows.slice(Math.min(10, rows.length - 1)));
 					}
 				});
