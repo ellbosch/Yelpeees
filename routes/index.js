@@ -195,24 +195,6 @@ function getCloseBusinesses(rows, location, callback) {
 	var result = [];
 	var count = 0;
 	var check = rows.length;
-<<<<<<< HEAD
-
-	for (var i = 0; i < rows.length; i++) {
-		(function(row) {
-			within10Miles(rows[row], location, function(err, isClose) {
-				if (err) {
-					console.log(err);
-					callback(err, null);
-				} else {
-					if (isClose) {
-						result.push(rows[row]);
-						if (row == rows.length - 1) {
-							callback(null, result);
-						}
-					} else {
-						if (row == rows.length - 1) {
-							callback(null, result);
-=======
 	if (rows.length == 0) {
 		callback(null, []);
 	} else {
@@ -232,7 +214,6 @@ function getCloseBusinesses(rows, location, callback) {
 							if (row == rows.length - 1) {
 							callback(null, result);
 							}
->>>>>>> beb139b49868098d058d9d3865f9679f557a7061
 						}
 					}
 				});
@@ -512,7 +493,11 @@ exports.validateUser = function(req, res) {
 
 function within10Miles(row, loc2, callback) {
 	var loc1 = row[3] + ", " + row[4];
+	
+	// FOR LIMITING API CALLS
 	callback(null, true);
+
+	// ADD THIS BACK FOR DEMO
 	/*gm.distance(loc1, loc2, function(err, distanceData) {
 		if (err) {
 			callback(err, null);
