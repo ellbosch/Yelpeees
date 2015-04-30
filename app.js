@@ -34,6 +34,7 @@ routes.init(function() {
 	app.post('/create_account', routes.createAccount);
 	app.post('/log_in', routes.validateUser);
 	app.get('/login', routes.login);
+	app.get('/logout', routes.logout);
 	app.get('/signup', routes.signup);
 	/////////////////////
 
