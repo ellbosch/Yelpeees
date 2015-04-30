@@ -67,23 +67,23 @@ $(function(){
 
 	// // FOR ELLA'S TESTIN PURPOSES
 
-	// function search_businesses() {
-	// $.ajax({
-	// 			async: true,
-	// 			url: "/searchBusinesses",
-	// 			type: "POST",
-	// 			data: {
-	// 					"restaurant":  "domino",
-	// 					"location": "39.952117099999995, -75.20109599999999"
-	// 				},
-	// 				success: function(data) {
-	// 					console.log(data);
-	// 				},
-	// 				error: function (xhr, ajaxOptions, thrownError) {
-	// 					console.log("error");
-	// 				}
-	// 		});
-	// 	}
+	function search_businesses() {
+	$.ajax({
+				async: true,
+				url: "/searchBusinesses",
+				type: "POST",
+				data: {
+						"restaurant":  "McDonald's",
+						"location": "39.952117099999995, -75.20109599999999"
+					},
+					success: function(data) {
+						console.log(data);
+					},
+					error: function (xhr, ajaxOptions, thrownError) {
+						console.log("error");
+					}
+			});
+		}
 
 
 	// function search_reviews() {
@@ -104,8 +104,8 @@ $(function(){
 
 
 
+	search_businesses();
 
-	search_reviews();
 	function search_reviews() {
 		$.ajax({
 			async: true,
@@ -121,6 +121,7 @@ $(function(){
 				}
 			});
 		}
+
 
 	function show_current_location(data) {
 		var zip = data["zipcode"];
