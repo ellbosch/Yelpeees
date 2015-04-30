@@ -164,6 +164,7 @@ exports.getBusinesses = function (req, res) {
 						if (err) {
 							console.log(err);
 						} else {
+							//console.log("sending back businesses: " + closeOnes);
 							res.send({success:true, businesses:closeOnes.slice(0, Math.min(10, closeOnes.length - 1))});
 						}
 					});
@@ -194,26 +195,30 @@ function getCloseBusinesses(rows, location, callback) {
 	var result = [];
 	var count = 0;
 	var check = rows.length;
-	for (var i = 0; i < rows.length; i++) {
-		(function(row) {
-			within10Miles(rows[row], location, function(err, isClose) {
-				if (err) {
-					console.log(err);
-					callback(err, null);
-				} else {
-					if (isClose) {
-						result.push(rows[row]);
-						if (row == rows.length - 1) {
-							callback(null, result);
-						}
+	if (rows.length == 0) {
+		callback(null, []);
+	} else {
+		for (var i = 0; i < rows.length; i++) {
+			(function(row) {
+				within10Miles(rows[row], location, function(err, isClose) {
+					if (err) {
+						console.log(err);
+						callback(err, null);
 					} else {
-						if (row == rows.length - 1) {
-						callback(null, result);
+						if (isClose) {
+							result.push(rows[row]);
+							if (row == rows.length - 1) {
+								callback(null, result);
+							}
+						} else {
+							if (row == rows.length - 1) {
+							callback(null, result);
+							}
 						}
 					}
-				}
-			});
-		})(i);
+				});
+			})(i);
+		}
 	}
 }
 
@@ -369,6 +374,10 @@ exports.login = function(req, res) {
 	res.render('login', {error: ""});
 }
 
+exports.logout = function(req, res) {
+	req.session.userid = null;
+	res.redirect('/');
+}
 
 exports.populateSearchResults = function(req, res) {
 	if (! req.session.search_results) {
