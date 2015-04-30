@@ -17,9 +17,6 @@ exports.index = function(req, res) {
 	res.render('index');
 }
 
-
-<<<<<<< Updated upstream
-=======
 exports.login = function(req, res) {
 	res.render('login', {error: ""});
 }
@@ -185,7 +182,6 @@ function within10Miles(row, loc2, callback) {
 		}
 	});
 }
->>>>>>> Stashed changes
 
 exports.getBusinesses = function (req, res) {
 	console.log("getting businesses");
