@@ -27,9 +27,8 @@ app.use(session({secret: 'mypennkeygoeshere'}));
 routes.init(function() {
 	app.get( '/', routes.index );
 	app.get('/example', routes.example);
-	app.get('/search', routes.getReviews);
 	app.post('/example', routes.example);
-	app.post('/search', routes.getReviews);
+	app.post('/search', routes.getReviewsAndRating);
 	app.post('/searchBusinesses', routes.getBusinesses);
 	app.get('/search_results', routes.populateSearchResults);
 	app.post('/reverse_geocode', routes.getReverseGeocode);

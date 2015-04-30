@@ -149,73 +149,76 @@ exports.getGeocode = function(req, res) {
 	});
 }
 
-exports.getReviews = function (req, res) {
+exports.getReviewsAndRating = function (req, res) {
 	oracledb.getConnection(oracleConnectInfo, function(err, connection) {
 		if (err) {
 			console.log(err.stack);
 		}
-		var location = req.body.location;
-		var restaurant = req.body.restaurant;
+		var restaurantId = req.body.businessId;
+		req.session.business_id = restaurantId;
 		var food = req.body.food;
-		var sqlRestaurant = "'%" + restaurant.toLowerCase() + "%'";
+		var sqlRestaurant = "'" + restaurantId + "'";
 		var sqlFood = "'%" + food.toLowerCase() + "%'";
-		connection.execute("SELECT B.name, B.address, R.text, R.stars, R.rdate "
-			+ 			   "FROM businesses B, reviews R "
-			+              "WHERE B.business_id = R.business_id AND LOWER(B.name) LIKE " + sqlRestaurant + " AND LOWER(R.text) LIKE " + sqlFood
-			+              " ORDER BY B.business_id" , 
+		connection.execute("SELECT R.text, R.stars, R.rdate "
+			+ 			   "FROM reviews R "
+			+              "WHERE R.business_id = " + sqlRestaurant + " AND LOWER(R.text) LIKE " + sqlFood
 
-							{}, {outFormat: oracledb.OBJECT}, function(err, reviewsResult) {
+							, function(err, reviewsResult) {
 			if (err) {
-				console.log("error executing business query");
+				console.log("error executing reviews query");
 				console.log(err);
-			} 
-			else {
-				connection.execute("SELECT B.name, B.address, T.text, T.tdate "
-			+ 			   "FROM businesses B, tips T "
-			+              "WHERE B.business_id = T.business_id AND LOWER(B.name) LIKE " + sqlRestaurant + " AND LOWER(T.text) LIKE " + sqlFood
-			+ 			   " ORDER BY B.business_id" , 
-
-							{}, {outFormat: oracledb.OBJECT}, function(err, tipsResult) {
-
-					var reviews = reviewsResult.rows;
-					var tips = tipsResult.rows;
-					var firstId = reviews[0].BUSINESS_ID;
-					var reviewSet = [];
-					var result = [];
-					var i, j, count = 0;
-					console.log("starting to search the reviews");
-					while (i < reviews.length && j < tips.length) {
-						console.log("populating results");
-						var name = reviews[i].NAME;
-						var address = reviews[i].ADDRESS;
-						count = 0;
-						while (reviews[i].BUSINESS_ID == firstId) {
-							console.log("looping through reviews");
-							reviewSet.push(reviews[i].TEXT);
-							i++;
-							count++;
+				res.send({success:false, message: "Error querying the database for that food item. Please try again."});
+			} else {
+				connection.execute("SELECT T.text, T.tdate "
+			+ 			   "FROM tips T "
+			+              "WHERE T.business_id = " + sqlRestaurant + " AND LOWER(T.text) LIKE " + sqlFood
+						, function(err, tipsResult) {
+					if (err) {
+						console.log(err);
+						res.send({success:false, message: "Error querying the database for that food item. Please try again."});
+					} else {
+						var reviews = reviewsResult.rows;
+						var tips = tipsResult.rows;
+						console.log(tips);
+						var result = [];
+						var reviewTexts = [];
+						var sumStars = 0;
+						if (reviews.length == 0) {
+							res.send({success:false, message: "There were no reviews that matched your query. Please try another food item."});
+						} else {
+							for (var i = 0; i < reviews.length; i++) {
+								reviewTexts.push(reviews[i][0]);
+								console.log(reviews[i][1]);
+								sumStars += parseInt(reviews[i][1]);
+								if (i == reviews.length - 1) {
+									if (tips.length == 0) {
+										console.log(reviewTexts);
+										var result = JSON.stringify({reviews:reviewTexts, sentiment:sentiment_analysis(reviewTexts, food), avgStars:sumStars/reviews.length});
+										console.log(result);
+										res.send(JSON.stringify({success: true, data: result}));
+									} else {
+										for (var j = 0; j < tips.length; j++) {
+											console.log("populating tips");
+											reviewTexts.push(tips[j][0]);
+											if (j == tips.length - 1) {
+												connection.release(function(err) {
+													if (err) {
+														console.log("error releasing db connection in getReviewsAndRating");
+														console.log(err);
+														res.send({success:false, message: "Error querying the database for that food item. Please try again."});
+													} else {
+														var result = JSON.stringify({reviews:reviewTexts, sentiment:sentiment_analysis(reviewTexts, food), avgStars:sumStars/reviews.length});
+														console.log(result);
+														res.send(JSON.stringify({success: true, data: result}));
+													}
+												});
+											}
+										}
+									}
+								}
+							}
 						}
-						while (j < tips.length && tips[j].BUSINESS_ID == firstId) {
-							reviewSet.push(tips[j].TEXT);
-							j++;
-							count++;
-						}
-						if (reviewSet.length > 0) {
-							result.push(JSON.stringify({"business_name":name, "address":address, "rating":sentiment_analysis(reviewSet, food.toLowerCase()), "num_reviews":count}));
-						}
-						if (i < reviews.length) {
-							firstId = reviews[i].BUSINESS_ID;
-						}
-					}	
-					
-					connection.release(function(err) {
-						if (err) {
-							console.log(err);
-							res.render('index');
-						} 
-						req.session.search_results = reviewsResult.rows;
-						res.send(JSON.stringify({success: true, data: result}));
-					});
+					}
 				});
 			}
 		});
