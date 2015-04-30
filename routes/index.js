@@ -194,6 +194,7 @@ function getCloseBusinesses(rows, location, callback) {
 	var result = [];
 	var count = 0;
 	var check = rows.length;
+
 	for (var i = 0; i < rows.length; i++) {
 		(function(row) {
 			within10Miles(rows[row], location, function(err, isClose) {
@@ -208,7 +209,7 @@ function getCloseBusinesses(rows, location, callback) {
 						}
 					} else {
 						if (row == rows.length - 1) {
-						callback(null, result);
+							callback(null, result);
 						}
 					}
 				}
@@ -488,6 +489,7 @@ function within10Miles(row, loc2, callback) {
 		} else {
 			if (!distanceData || distanceData.rows.length == 0 || distanceData.rows[0].elements[0].status != "OK") {
 				callback(null, false);
+				console.log(distanceData);
 			} else {
 				// TEMPORARY 1000 mile radius until db fully loaded
 				callback(null, parseFloat(distanceData.rows[0].elements[0].distance.text.split(" ")[0].replace(/,/g, '')) < 1609.34);
