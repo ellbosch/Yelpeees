@@ -54,8 +54,7 @@
 			    	<div class="form-group">
 		    			<label for="search-food-input" class="col-sm-1 control-label">Location</label>
 		    			<div class="col-sm-12 col-md-8" id="location-input-div">
-			    			<input type="text" class="form-control" id="search-input-location" 
-			    			placeholder="Type in your location or press the get location button">
+			    			<input type="text" class="form-control" id="search-input-location" placeholder="Type in your location or press the get location button">
 		    			</div>
 		    			<div id="current-location-btn" title="Get current location">
 			    			<i class="fa fa-location-arrow"></i>
@@ -85,30 +84,37 @@
 		    	</div>
 
 				<!-- FOOD RATING DIV-->
-				<div id="picked-restaurant-div" class="col-md-8 col-sm-12">
-				    <!-- FOOD SEARCH -->
-				    <div id="food-search-div" class="input-group card">
-				    	<span><i class="fa fa-search"></i></span>
-				    	<input type="text" placeholder="Search for food" id="search-food-input">
-				    </div>
+				<div id="picked-restaurant-div">
+					<div class="col-md-8 col-sm-12">
+					    <!-- FOOD SEARCH -->
+					    <div id="food-search-div" class="input-group card">
+					    	<span><i class="fa fa-search"></i></span>
+					    	<input type="text" placeholder="Search for food" id="search-food-input">
+					    </div>
 
-				    <!-- FOOD RATING -->
-					<div class="card">
-						<span id="food-item-header">TEST</span>
-						<div id="progress-div">
-							<div class="progress">
-								<div class="progress-bar progress-bar-success" style="width: 65%"></div>
-								<div class="progress-bar progress-bar-danger" style="width: 35%"></div>
+					    <!-- FOOD RATING -->
+						<div class="card" id="food-rating-div">
+							<span id="food-item-header"></span>
+							<div id="progress-div">
+								<div class="progress">
+									<div class="progress-bar progress-bar-success" style="width: 65%"></div>
+									<div class="progress-bar progress-bar-danger" style="width: 35%"></div>
+								</div>
+								<span id="rating-span"><span id="sentiment-rating"></span>% rating from <span id="num-reviews"></span> reviews</span>
 							</div>
-							<span id="rating-span"><span id="sentiment-rating"></span>% rating from <span id="num-reviews"></span> reviews</span>
 						</div>
 					</div>
 
-					<!-- REVIEWS -->
-					<div id="reviews-div"></div>
-					<div class="col-md-4 col-sm-12">
-						<h3>Restaurant Info</h3>
+					<!-- SELECTED RESTAURANT INFO -->
+					<div id="restaurant-info-div" class="col-md-4 col-sm-12">
+						<h3></h3>
+						<p id="addr_line1"></p>
+						<p id="addr_line2"></p>
 					</div>
+
+					<!-- REVIEWS -->
+					<div id="reviews-div" class="col-md-8 col-sm-12"></div>
+
 				</div>
 		    </div>
 		</div>

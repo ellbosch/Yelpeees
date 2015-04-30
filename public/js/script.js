@@ -1,4 +1,4 @@
-$(function(){
+$(function() {
 	var jqXHR;
 	var GLOBAL = {
 		location: ""
@@ -64,9 +64,6 @@ $(function(){
 		}
 	}
 
-
-	// // FOR ELLA'S TESTIN PURPOSES
-
 	function search_businesses() {
 	$.ajax({
 				async: true,
@@ -84,8 +81,6 @@ $(function(){
 					}
 			});
 		}
-
-		// search_reviews();
 
 	function search_reviews() {
 		$.ajax({
@@ -119,8 +114,6 @@ $(function(){
 			}
 		});
 	}
-
-	//getHistory();
 
 	function show_current_location(data) {
 		var zip = data["zipcode"];
@@ -262,7 +255,7 @@ $(function(){
 
 	
 	// event handler for getting businesses
-	$("#search-restaurant-btn").on('click keypress', function(e) {
+	$("#search-restaurant-btn").on('click', function(e) {
 		e.preventDefault();
 
 		var input = $("#restaurant-search-input").val().trim();	// check if input is valid
@@ -272,6 +265,13 @@ $(function(){
 			var location = GLOBAL.location;
 			request_business_data(input, location);
 		});
+	});
+
+	// calls search-restaurant on enter press
+	$("#restaurant-search-input").keypress(function(e) {
+		if(e.which == 13){
+            $('#search-restaurant-btn').click();
+        }
 	});
 
 	// show search inputs when search button is clicked
@@ -287,58 +287,30 @@ $(function(){
 		e.preventDefault();
 		confirm_location();
 	});
+	
+	// calls location search on enter press
+	$("#search-input-location").keypress(function(e) {
+		if(e.which == 13){
+            $('#location-input-btn').click();
+        }
+	});
 
+	// event handler for selecting a restaurant
+	$("#wrapper-result #restaurant-results-div").on('click', ".restaurant-result", function() {
+		var business_name = $(this).find(".restaurant-name").text();
+		var addr_1 = $(this).find(".restaurant-address p:first-child").text();
+		var addr_2 = $(this).find(".restaurant-address p:nth-child(2)").text();
 
+		$("#restaurant-results-div").hide();
+		$("#picked-restaurant-div").show();
 
-	// event handler for when a search is made
-	// $("#search-input-btn").on('click', function(event) {
-	// 	event.preventDefault();
-	// 	var is_valid = check_for_valid_inputs($("#edit-restaurant-div form"));
-	// 	$("#error-div").hide();
-
-	// 	// below only executes if all inputs have entries
-	// 	if (is_valid) {
-	// 		$("#loading-screen").show();	// show loading screen
-	// 		$("#edit-restaurant-div").hide();	// hide search field divs
-
-	// 		var food_input = $("#search-input-food").val().trim();
-	// 		var restaurant_input = $("#search-input-restaurant").val().trim();
-	// 		var location_input = $("#search-input-location").val().trim();
-
-	// 		jqXHR = $.ajax({
-	// 			async: true,
-	// 			url: "/search",
-	// 			type: "POST",
-	// 			data: {
-	// 					"food": food_input, 
-	// 					"restaurant":  restaurant_input,
-	// 					"location": location_input
-	// 				},
-	// 				success: function(data) {
-	// 					$("#reviews-div").html("");		// hide old review data
-	// 					var data_parsed = JSON.parse(data);
-	// 					var data_result = data_parsed["data"];
-	// 					var sentiment_result = data_parsed["sentiment"];
-	// 					var reviews_result = JSON.parse(data_result);
-
-	// 					if (reviews_result.length == 0) {
-	// 						cancel_query();
-	// 						// show error message when no reviews are returned from query
-	// 						$("#error-div").show();
-	// 					} else {
-	// 						// display food data
-	// 						display_food_data(food_input, reviews_result, parseFloat(sentiment_result["avg"]));
-	// 					}
-	// 				},
-	// 				error: function (xhr, ajaxOptions, thrownError) {
-	// 					// console.log("error");
-	// 				}
-	// 		});
-	// 	}
-	// });
+		$("#restaurant-info-div h3").html(business_name);
+		$("#restaurant-info-div #addr_line1").html(addr_1);
+		$("#restaurant-info-div #addr_line2").html(addr_2);
+	});
 
 	// event handler for canceling loads
 	$("#cancel-load").on('click', function() {
 		cancel_query();	
 	});
-})
+});
