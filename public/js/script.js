@@ -85,28 +85,6 @@ $(function(){
 			});
 		}
 
-
-	// function search_reviews() {
-	// 	$.ajax({
-	// 		async: true,
-	// 		url: "/search",
-	// 		type: "POST",
-	// 		data: {
-	// 			"businessId":  "OrTArReTvdVxEKBAxsz3Ww",
-	// 			"food": "chicken"
-	// 		}, success: function(data) {
-	// 				console.log(data);
-	// 		}, error: function (xhr, ajaxOptions, thrownError) {
-	// 				console.log("error");
-	// 			}
-	// 		});
-	// 	}
-
-
-
-	// search_businesses();
-
-	// search_reviews();
 	function search_reviews() {
 		$.ajax({
 			async: true,
@@ -140,7 +118,7 @@ $(function(){
 		});
 	}
 
-	getHistory();
+	//getHistory();
 
 	function show_current_location(data) {
 		var zip = data["zipcode"];

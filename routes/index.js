@@ -338,6 +338,20 @@ exports.getReviewsAndRating = function (req, res) {
 	});
 }
 
+exports.getHistory = function(req, res) {
+	var userId = req.session.userid;
+	oracledb.getConnection(oracleConnectInfo, function(err, connection) {
+		connection.execute("SELECT * FROM history H WHERE H.user_id = :uid", [userId], function(err, result) {
+			if (err) {
+				console.log(err);
+				res.send({success:false, message:"Error fetching user history."});
+			} else {
+				var rows = result.rows;
+				res.send({success:true, data:rows.slice(Math.min(10, rows.length - 1))});
+			}
+		});
+	});
+}
 
 exports.getReverseGeocode = function(req, res) {
 	var coords = req.body.coords;
@@ -409,7 +423,7 @@ exports.signup = function(req, res) {
 
 
 function updateUserHistory(connection, userId, businessId, food, callback) {
-	connection.execute("INSERT INTO history VALUES (:userid, :food_item, :business_id)",
+	connection.execute("INSERT /*+ ignore_row_on_dupkey_index(userid, food_item, business_id) */ INTO history VALUES (:userid, :food_item, :business_id)",
 						[userId, food, businessId], {isAutoCommit: true}, function(err, result) {
 		if (err) {
 			console.log("error updating user history");
