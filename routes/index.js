@@ -5,6 +5,7 @@ var oracledb = require('oracledb');
 var dbconfig = require('../dbconfig.js')
 var oracleConnectInfo = {user: dbconfig.user, password: dbconfig.password, connectString: dbconfig.connectString};
 var gm = require('googlemaps');
+var crypto = require('crypto');
 
 // // We export the init() function to initialize
 // // our KVS values
@@ -17,6 +18,174 @@ exports.index = function(req, res) {
 }
 
 
+<<<<<<< Updated upstream
+=======
+exports.login = function(req, res) {
+	res.render('login', {error: ""});
+}
+
+exports.signup = function(req, res) {
+	res.render('signup', {error: ""});
+}
+
+exports.validateUser = function(req, res) {
+	if (req.body.username && req.body.password) {
+		var username = req.body.username;
+		oracledb.getConnection(oracleConnectInfo, function(err, connection) {
+			if (err) {
+				console.log(err.stack);
+				res.render("login", {error: "Error connecting to the database. Sorry, please try again"});
+				return;
+			}
+			connection.execute("SELECT *"
+					+		   "FROM users U "
+					+          "WHERE U.username = :username", ["'" + req.body.username + "'"], function(err, result) {
+				if (err) {
+					console.log("error fetching username count from users table: createAccount()");
+					res.render("login", {error: "Error connecting to the database. Sorry, please try again"});
+					return;
+				}	
+
+				if (result.rows.length == 0) {
+					res.render("login", {error: "Invalid username"});
+					return;
+				}
+				var encrypter = crypto.createHash('sha1');
+				encrypter.update(req.body.password);
+				var encrypted_password = encrypter.digest('base64');
+				if (result.rows[0][1] == "'" + encrypted_password + "'") {
+					req.session.username = username;
+					req.session.userid = result.rows[0][5];
+					res.redirect("/");
+					return;
+				}
+				else {
+					res.render("login", {error: "Invalid password"});
+					return;
+				}
+			});
+		});
+	}
+	else {
+		res.render("login", {error: "Empty fields presents. Please make sure to fill out all the fields"});
+		return;
+	}
+}
+
+exports.createAccount = function(req, res) {
+
+	if (req.body.username && req.body.password && req.body.firstname &&
+				req.body.lastname && req.body.email) {
+
+		oracledb.getConnection(oracleConnectInfo, function(err, connection) {
+			if (err) {
+				console.log(err.stack);
+				res.render("signup", {error: "Error connecting to the database. Sorry, please try again"});
+				return;
+			}
+			connection.execute("SELECT * "
+					+		   "FROM users U "
+					+          "WHERE U.username = :username", ["'" + req.body.username + "'"], function(err, result) {
+
+				if (err) {
+					console.log("error fetching username count from users table: createAccount()");
+					res.render("signup", {error: "Error connecting to the database. Sorry, please try again"});
+					return;
+				}	
+				if (result.rows.length > 0) {
+					res.render("signup", {error: "The inputted username already exists. Please try again with another username"});
+					return;
+				}
+				connection.execute("SELECT count(*) AS count "
+						+		   "FROM users U", function(err, result) {
+					if (err) {
+						console.log(err);
+						console.log("Error inserting user into db: createAccount()");
+						res.render("signup", {error: "Error connecting to the database. Sorry, please try again"});
+						return;
+					}
+					var userid = parseInt(result.rows[0]) + 1;
+					var encrypter = crypto.createHash('sha1');
+					encrypter.update(req.body.password);
+					var encrypted_password = encrypter.digest('base64');
+					connection.execute("INSERT INTO users VALUES (:username, :password, :firstname, :lastname, :email, :userid)" ,
+							["'" + req.body.username.substring(0, 50) + "'", "'" + encrypted_password + "'", 
+							"'" + req.body.firstname.substring(0, 50) + "'", "'" + req.body.lastname.substring(0, 50) + "'", 
+							"'" + req.body.email.substring(0, 50) + "'", userid], {isAutoCommit: true}, function(err, result) {
+						if (err) {
+							console.log(err);
+							console.log("Error inserting user into db: createAccount()");
+							res.render("signup", {error: "Error connecting to the database. Sorry, please try again"});
+							return;
+						}
+						
+
+						connection.release(function(err) {
+							if (err) {
+								console.log(err);
+								res.render("signup", {error: "Error connecting to the database. Sorry, please try again"});
+								return;
+							} 
+							req.session.username = req.body.username;
+							req.session.userid = userid;
+							res.redirect("/");
+							return;
+						});
+					});
+				});
+				
+			});
+		});
+	}
+	else {
+		res.render("signup", {error: "Please fill out all the form entries and resubmit"});
+		return;
+	}
+}
+
+function getCloseBusinesses(rows, location, callback) {
+	var result = [];
+	var count = 0;
+	var check = rows.length;
+	for (var i = 0; i < rows.length; i++) {
+		(function(row) {
+			within10Miles(rows[row], location, function(err, isClose) {
+				if (err) {
+					console.log(err);
+					callback(err, null);
+				} else {
+					if (isClose) {
+						result.push(rows[row]);
+						if (row == rows.length - 1) {
+							callback(null, result);
+						}
+					} else {
+						if (row == rows.length - 1) {
+						callback(null, result);
+						}
+					}
+				}
+			});
+		})(i);
+	}
+}
+
+function within10Miles(row, loc2, callback) {
+	var loc1 = row[3] + ", " + row[4];
+	gm.distance(loc1, loc2, function(err, distanceData) {
+		if (err) {
+			callback(err, null);
+		} else {
+			if (!distanceData || distanceData.rows[0].elements[0].status != "OK") {
+				callback(null, false);
+			} else {
+				// TEMPORARY 1000 mile radius until db fully loaded
+				callback(null, parseFloat(distanceData.rows[0].elements[0].distance.text.split(" ")[0].replace(/,/g, '')) < 1609.34);
+			}
+		}
+	});
+}
+>>>>>>> Stashed changes
 
 exports.getBusinesses = function (req, res) {
 	console.log("getting businesses");

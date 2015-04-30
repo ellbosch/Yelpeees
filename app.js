@@ -31,6 +31,10 @@ routes.init(function() {
 	app.get('/search_results', routes.populateSearchResults);
 	app.post('/reverse_geocode', routes.getReverseGeocode);
 	app.post('/geocode', routes.getGeocode);
+	app.post('/create_account', routes.createAccount);
+	app.post('/log_in', routes.validateUser);
+	app.get('/login', routes.login);
+	app.get('/signup', routes.signup);
 	/////////////////////
 	
 	http.createServer( app ).listen( app.get( 'port' ), function(){
