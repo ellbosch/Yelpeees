@@ -94,7 +94,9 @@ $(function() {
 			}, success: function(data) {
 				if (data.success) {
 					var parsed_data = JSON.parse(data.data)
-					var reviews = parsed_data["reviews"];
+					console.log(parsed_data);
+					var reviews = parsed_data.reviews;
+					console.log("REVIEWS (from data): " + reviews);
 					var sentiment = parsed_data["sentiment"]["avg"];
 					display_review_data(food_input, reviews, sentiment);
 				} else {
@@ -108,25 +110,29 @@ $(function() {
 
 	// displays food review data
 	function display_review_data(food_input, reviews, sentiment_rating) {
+		console.log(typeof reviews);
+
+
+
 		$("#loading-screen").hide();		// hide loading screen
 		$("#food-rating-div").show();			// show food-item-div if it is not already showing
 		$("#reviews-div").show();
 
 		var food_input_cap = food_input.charAt(0).toUpperCase() + food_input.substring(1);
-		var rating = Math.round(sentiment_rating/12 * 100);
 
 		// set text to header
 		$("#food-item-header").html(food_input.toUpperCase());
 
 		// show rating
-		$("#progress-div .progress-bar-success").width(rating + "%");
-		$("#progress-div .progress-bar-danger").width((100-rating) + "%");
-		$("#sentiment-rating").html(rating);	// show rating percentage
+		$("#progress-div .progress-bar-success").width(sentiment_rating + "%");
+		$("#progress-div .progress-bar-danger").width((100-sentiment_rating) + "%");
+		$("#sentiment-rating").html(sentiment_rating);	// show rating percentage
 		$("#num-reviews").html(reviews.length);	// show number of reviews
 
 		// show new yelp reviews
 		var review_html = "";
-		for (r in reviews) {
+		for (var i = 0; i < reviews.length; i++) {
+			var r = reviews[i];
 			review_html = review_html + "<div class='review'><p>" + r + "</p></div>"
 		}
 		$("#reviews-text-div").html(review_html);

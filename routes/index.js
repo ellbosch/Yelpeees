@@ -272,7 +272,6 @@ exports.getReviewsAndRating = function (req, res) {
 							} else {
 								var reviews = reviewsResult.rows;
 								var tips = tipsResult.rows;
-								console.log(tips);
 								var result = [];
 								var reviewTexts = [];
 								var sumStars = 0;
@@ -281,11 +280,9 @@ exports.getReviewsAndRating = function (req, res) {
 								} else {
 									for (var i = 0; i < reviews.length; i++) {
 										reviewTexts.push(reviews[i][0]);
-										console.log(reviews[i][1]);
 										sumStars += parseInt(reviews[i][1]);
 										if (i == reviews.length - 1) {
 											if (tips.length == 0) {
-												console.log(reviewTexts);
 												var result = JSON.stringify({reviews:reviewTexts, sentiment:sentimentAnalysis(reviewTexts, food), avgStars:sumStars/reviews.length});
 												console.log(result);
 												res.send(JSON.stringify({success: true, data: result}));
@@ -393,14 +390,14 @@ function sentimentAnalysis(reviews, term) {
 	var sentiments = [];
 	var minSentiment = Number.MAX_VALUE;
 	var maxSentiment = Number.NEGATIVE_INFINITY;
-	for (review in reviews) {
+	for (var review = 0; review < reviews.length; review++) {
 		var text = reviews[review];
 		var sent = analyzeReview(text, term);
 		sentiments.push(sent);
 	}
 	var sum = 0;
-	for (sent in sentiments) {
-		sum += sentiments[sent];
+	for (var sent = 0; sent < sentiments.length; sent++) {
+		sum += (parseFloat(sentiments[sent]) + 4.0)/8;
 		if (sentiments[sent] < minSentiment) {
 			minSentiment = sentiments[sent];
 		} 
@@ -408,7 +405,8 @@ function sentimentAnalysis(reviews, term) {
 			maxSentiment = sentiments[sent];
 		}
 	}
-	var avg = sum/sentiments.length;
+	var avg = Math.round((sum/sentiments.length) * 100);
+	console.log(avg);
 	return {"avg": avg, "min": minSentiment, "max":maxSentiment};
 }
 
@@ -495,7 +493,8 @@ exports.validateUser = function(req, res) {
 
 function within10Miles(row, loc2, callback) {
 	var loc1 = row[3] + ", " + row[4];
-	gm.distance(loc1, loc2, function(err, distanceData) {
+	callback(null, true);
+	/*gm.distance(loc1, loc2, function(err, distanceData) {
 		if (err) {
 			callback(err, null);
 		} else {
@@ -506,5 +505,5 @@ function within10Miles(row, loc2, callback) {
 				callback(null, parseFloat(distanceData.rows[0].elements[0].distance.text.split(" ")[0].replace(/,/g, '')) < 1609.34);
 			}
 		}
-	});
+	});*/
 }
