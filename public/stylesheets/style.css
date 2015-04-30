@@ -1,5 +1,7 @@
 body {
   background-color: #f6f6f6;
+  background-image: url("../northern-lights.jpg");
+  background-size: cover;
 }
 
 .container-fluid {
@@ -239,6 +241,7 @@ body {
 
 #restaurant-results-div {
   display: none;
+  color: #B3CEE1;
 }
 
 #restaurant-results-div .restaurant-result {
