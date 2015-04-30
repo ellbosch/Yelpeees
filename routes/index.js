@@ -159,71 +159,119 @@ exports.getReviewsAndRating = function (req, res) {
 		var food = req.body.food;
 		var sqlRestaurant = "'" + restaurantId + "'";
 		var sqlFood = "'%" + food.toLowerCase() + "%'";
-		connection.execute("SELECT R.text, R.stars, R.rdate "
-			+ 			   "FROM reviews R "
-			+              "WHERE R.business_id = " + sqlRestaurant + " AND LOWER(R.text) LIKE " + sqlFood
-
-							, function(err, reviewsResult) {
+		//var userId = req.session.userid;
+		var userId = 1;
+		updateUserHistory(userId, restaurantId, food, function(err, success) {
 			if (err) {
-				console.log("error executing reviews query");
 				console.log(err);
-				res.send({success:false, message: "Error querying the database for that food item. Please try again."});
+				res.send({success:false, message: "Error updating user history. Please try again"});
 			} else {
-				connection.execute("SELECT T.text, T.tdate "
-			+ 			   "FROM tips T "
-			+              "WHERE T.business_id = " + sqlRestaurant + " AND LOWER(T.text) LIKE " + sqlFood
-						, function(err, tipsResult) {
+				connection.execute("SELECT R.text, R.stars, R.rdate "
+					+ 			   "FROM reviews R "
+					+              "WHERE R.business_id = " + sqlRestaurant + " AND LOWER(R.text) LIKE " + sqlFood
+
+									, function(err, reviewsResult) {
 					if (err) {
+						console.log("error executing reviews query");
 						console.log(err);
 						res.send({success:false, message: "Error querying the database for that food item. Please try again."});
 					} else {
-						var reviews = reviewsResult.rows;
-						var tips = tipsResult.rows;
-						console.log(tips);
-						var result = [];
-						var reviewTexts = [];
-						var sumStars = 0;
-						if (reviews.length == 0) {
-							res.send({success:false, message: "There were no reviews that matched your query. Please try another food item."});
-						} else {
-							for (var i = 0; i < reviews.length; i++) {
-								reviewTexts.push(reviews[i][0]);
-								console.log(reviews[i][1]);
-								sumStars += parseInt(reviews[i][1]);
-								if (i == reviews.length - 1) {
-									if (tips.length == 0) {
-										console.log(reviewTexts);
-										var result = JSON.stringify({reviews:reviewTexts, sentiment:sentiment_analysis(reviewTexts, food), avgStars:sumStars/reviews.length});
-										console.log(result);
-										res.send(JSON.stringify({success: true, data: result}));
-									} else {
-										for (var j = 0; j < tips.length; j++) {
-											console.log("populating tips");
-											reviewTexts.push(tips[j][0]);
-											if (j == tips.length - 1) {
-												connection.release(function(err) {
-													if (err) {
-														console.log("error releasing db connection in getReviewsAndRating");
-														console.log(err);
-														res.send({success:false, message: "Error querying the database for that food item. Please try again."});
-													} else {
-														var result = JSON.stringify({reviews:reviewTexts, sentiment:sentiment_analysis(reviewTexts, food), avgStars:sumStars/reviews.length});
-														console.log(result);
-														res.send(JSON.stringify({success: true, data: result}));
+						connection.execute("SELECT T.text, T.tdate "
+					+ 			   "FROM tips T "
+					+              "WHERE T.business_id = " + sqlRestaurant + " AND LOWER(T.text) LIKE " + sqlFood
+								, function(err, tipsResult) {
+							if (err) {
+								console.log(err);
+								res.send({success:false, message: "Error querying the database for that food item. Please try again."});
+							} else {
+								var reviews = reviewsResult.rows;
+								var tips = tipsResult.rows;
+								console.log(tips);
+								var result = [];
+								var reviewTexts = [];
+								var sumStars = 0;
+								if (reviews.length == 0) {
+									res.send({success:false, message: "There were no reviews that matched your query. Please try another food item."});
+								} else {
+									for (var i = 0; i < reviews.length; i++) {
+										reviewTexts.push(reviews[i][0]);
+										console.log(reviews[i][1]);
+										sumStars += parseInt(reviews[i][1]);
+										if (i == reviews.length - 1) {
+											if (tips.length == 0) {
+												console.log(reviewTexts);
+												var result = JSON.stringify({reviews:reviewTexts, sentiment:sentiment_analysis(reviewTexts, food), avgStars:sumStars/reviews.length});
+												console.log(result);
+												res.send(JSON.stringify({success: true, data: result}));
+											} else {
+												for (var j = 0; j < tips.length; j++) {
+													console.log("populating tips");
+													reviewTexts.push(tips[j][0]);
+													if (j == tips.length - 1) {
+														connection.release(function(err) {
+															if (err) {
+																console.log("error releasing db connection in getReviewsAndRating");
+																console.log(err);
+																res.send({success:false, message: "Error querying the database for that food item. Please try again."});
+															} else {
+																var result = JSON.stringify({reviews:reviewTexts, sentiment:sentiment_analysis(reviewTexts, food), avgStars:sumStars/reviews.length});
+																console.log(result);
+																res.send(JSON.stringify({success: true, data: result}));
+															}
+														});
 													}
-												});
+												}
 											}
 										}
 									}
 								}
 							}
-						}
+						});
 					}
 				});
 			}
 		});
+
 	});
 }
+
+
+function getBusinessInfo(businessId, callback) {
+	oracledb.getConnection(oracleConnectInfo, function(err, connection) {
+		if (err) {
+			console.log("error connecting to db");
+			callback(err, null);
+		} else {
+			connection.execute("SELECT B.name, B.address FROM businesses B WHERE business_id = " + "'" + businessId + "'", 
+				function(err, result) {
+					var info = result.rows;
+					callback(null, info[0]);
+			});
+		}
+	});
+}
+
+function updateUserHistory(userId, businessId, food, callback) {
+	oracledb.getConnection(oracleConnectInfo, function(err, connection) {
+		if (err) {
+			console.log(err.stack);
+			callback(err, null);
+		} else {
+			connection.execute("INSERT INTO history (userid, food_item, business_id) "
+						+ 		"VALUES ('" + userId + "', '" + food + "', '" + businessId + "')" 
+							, function(err, result) {
+				if (err) {
+					callback(err, null);
+				}	else {
+					callback(null, {success:true});
+				}				
+
+			});
+		}
+	});
+}
+
+
 
 function sentiment_analysis(reviews, term) {
 
