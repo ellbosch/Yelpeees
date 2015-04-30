@@ -44,8 +44,12 @@
 
 				<!-- MENU ITEMS -->
 		    	<ul id="menu">
-		    		<li><a href="/signup">Sign Up</a></li>
-					<li><a href="/login">Log In</a></li>
+		    		<%  if (!loggedIn) { %>
+						<li><a href="/signup">Sign Up</a></li>
+						<li><a href="/login">Log In</a></li>
+					<% } else { %>
+						<li><a href="/logout">Log Out</a></li>
+					<% }  %> 
 		    	</ul>
 		    </div>
 
