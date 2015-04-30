@@ -72,7 +72,7 @@
 		    	</form>
 		    </div>
 	    </div>
-
+ 
 	    <div class="container-fluid" id="container-div">
 
 		    <!-- ERROR MESSAGE -->
@@ -122,6 +122,15 @@
 				</div>
 		    </div>
 		</div>
+
+		<% if (loggedIn && history.length > 0) { %>
+		    <div class="history">
+		    	<h3>History</h3>
+		    	<% for (var i = 0; i < history.length; i++) { %>
+		    		<div class="hist"> <%= history[i][1].charAt(0).toUpperCase() + history[i][1].toLowerCase().substring(1, history[i][1].length) %> at <%= history[i][3] %> </div>
+		    	<% } %>
+		    </div>
+		<% } %>
 
 		<!-- LOADING SCREEN -->
 		<div id="loading-screen">

@@ -291,6 +291,7 @@ $(function() {
 	// show search inputs when search button is clicked
 	$("#current-location-div a").on('click', function() {
 		$("#edit-location-div").toggle();
+		$(".history").css({"padding-top": "100px"});
 	});
 
 	// event handler for getting current location
@@ -298,6 +299,7 @@ $(function() {
 
 	// event handler for saving custom location
 	$("#location-input-btn").on('click', function(e) {
+		$(".history").css({"padding-top": "5px"});
 		e.preventDefault();
 		confirm_location();
 	});

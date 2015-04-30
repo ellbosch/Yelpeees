@@ -277,12 +277,22 @@ body {
   margin-bottom: 0;
 }
 
+.history {
+  padding-top: 100px;
+  color: #C0CFDA;
+  padding-left: 15px;
+}
+
+.hist {
+  padding-left: 5px;
+}
+
 
 /* FOOD RESULTS */
 
 #picked-restaurant-div {
   display: none;
-  color: #B3CEE1
+  color: #B3CEE1;
 }
 
 #search-food-input {
