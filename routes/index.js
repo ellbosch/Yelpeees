@@ -7,71 +7,6 @@ var oracleConnectInfo = {user: dbconfig.user, password: dbconfig.password, conne
 var gm = require('googlemaps');
 var crypto = require('crypto');
 
-// // We export the init() function to initialize
-// // our KVS values
-exports.init = function(callback) {
-	callback();
-};
-
-exports.index = function(req, res) {
-	res.render('index');
-}
-
-
-<<<<<<< Updated upstream
-=======
-exports.login = function(req, res) {
-	res.render('login', {error: ""});
-}
-
-exports.signup = function(req, res) {
-	res.render('signup', {error: ""});
-}
-
-exports.validateUser = function(req, res) {
-	if (req.body.username && req.body.password) {
-		var username = req.body.username;
-		oracledb.getConnection(oracleConnectInfo, function(err, connection) {
-			if (err) {
-				console.log(err.stack);
-				res.render("login", {error: "Error connecting to the database. Sorry, please try again"});
-				return;
-			}
-			connection.execute("SELECT *"
-					+		   "FROM users U "
-					+          "WHERE U.username = :username", ["'" + req.body.username + "'"], function(err, result) {
-				if (err) {
-					console.log("error fetching username count from users table: createAccount()");
-					res.render("login", {error: "Error connecting to the database. Sorry, please try again"});
-					return;
-				}	
-
-				if (result.rows.length == 0) {
-					res.render("login", {error: "Invalid username"});
-					return;
-				}
-				var encrypter = crypto.createHash('sha1');
-				encrypter.update(req.body.password);
-				var encrypted_password = encrypter.digest('base64');
-				if (result.rows[0][1] == "'" + encrypted_password + "'") {
-					req.session.username = username;
-					req.session.userid = result.rows[0][5];
-					res.redirect("/");
-					return;
-				}
-				else {
-					res.render("login", {error: "Invalid password"});
-					return;
-				}
-			});
-		});
-	}
-	else {
-		res.render("login", {error: "Empty fields presents. Please make sure to fill out all the fields"});
-		return;
-	}
-}
-
 exports.createAccount = function(req, res) {
 
 	if (req.body.username && req.body.password && req.body.firstname &&
@@ -143,49 +78,15 @@ exports.createAccount = function(req, res) {
 	}
 }
 
-function getCloseBusinesses(rows, location, callback) {
-	var result = [];
-	var count = 0;
-	var check = rows.length;
-	for (var i = 0; i < rows.length; i++) {
-		(function(row) {
-			within10Miles(rows[row], location, function(err, isClose) {
-				if (err) {
-					console.log(err);
-					callback(err, null);
-				} else {
-					if (isClose) {
-						result.push(rows[row]);
-						if (row == rows.length - 1) {
-							callback(null, result);
-						}
-					} else {
-						if (row == rows.length - 1) {
-						callback(null, result);
-						}
-					}
-				}
-			});
-		})(i);
-	}
-}
+// // We export the init() function to initialize
+// // our KVS values
+exports.init = function(callback) {
+	callback();
+};
 
-function within10Miles(row, loc2, callback) {
-	var loc1 = row[3] + ", " + row[4];
-	gm.distance(loc1, loc2, function(err, distanceData) {
-		if (err) {
-			callback(err, null);
-		} else {
-			if (!distanceData || distanceData.rows[0].elements[0].status != "OK") {
-				callback(null, false);
-			} else {
-				// TEMPORARY 1000 mile radius until db fully loaded
-				callback(null, parseFloat(distanceData.rows[0].elements[0].distance.text.split(" ")[0].replace(/,/g, '')) < 1609.34);
-			}
-		}
-	});
+exports.index = function(req, res) {
+	res.render('index');
 }
->>>>>>> Stashed changes
 
 exports.getBusinesses = function (req, res) {
 	console.log("getting businesses");
@@ -392,6 +293,10 @@ function getZipcode(ad) {
 	return zip;
 }
 
+exports.login = function(req, res) {
+	res.render('login', {error: ""});
+}
+
 
 exports.populateSearchResults = function(req, res) {
 	if (! req.session.search_results) {
@@ -426,6 +331,9 @@ function sentimentAnalysis(reviews, term) {
 	return {"avg": avg, "min": minSentiment, "max":maxSentiment};
 }
 
+exports.signup = function(req, res) {
+	res.render('signup', {error: ""});
+}
 
 function analyzeReview(review, searchTerm){
 	var n=0, pos=0, sumSentiments = 0.0;
@@ -474,6 +382,50 @@ function updateUserHistory(userId, businessId, food, callback) {
 			});
 		}
 	});
+}
+
+exports.validateUser = function(req, res) {
+	if (req.body.username && req.body.password) {
+		var username = req.body.username;
+		oracledb.getConnection(oracleConnectInfo, function(err, connection) {
+			if (err) {
+				console.log(err.stack);
+				res.render("login", {error: "Error connecting to the database. Sorry, please try again"});
+				return;
+			}
+			connection.execute("SELECT *"
+					+		   "FROM users U "
+					+          "WHERE U.username = :username", ["'" + req.body.username + "'"], function(err, result) {
+				if (err) {
+					console.log("error fetching username count from users table: createAccount()");
+					res.render("login", {error: "Error connecting to the database. Sorry, please try again"});
+					return;
+				}	
+
+				if (result.rows.length == 0) {
+					res.render("login", {error: "Invalid username"});
+					return;
+				}
+				var encrypter = crypto.createHash('sha1');
+				encrypter.update(req.body.password);
+				var encrypted_password = encrypter.digest('base64');
+				if (result.rows[0][1] == "'" + encrypted_password + "'") {
+					req.session.username = username;
+					req.session.userid = result.rows[0][5];
+					res.redirect("/");
+					return;
+				}
+				else {
+					res.render("login", {error: "Invalid password"});
+					return;
+				}
+			});
+		});
+	}
+	else {
+		res.render("login", {error: "Empty fields presents. Please make sure to fill out all the fields"});
+		return;
+	}
 }
 
 
