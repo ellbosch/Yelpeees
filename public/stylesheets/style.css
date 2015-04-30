@@ -1,6 +1,10 @@
 body {
-  /*background-color: #f6f6f6;*/
-  overflow-x: hidden;
+  background-color: #f6f6f6;
+}
+
+.container-fluid {
+  padding-left: 5px;
+  padding-right: 5px;
 }
 
 /* NAV */
@@ -25,20 +29,21 @@ body {
 }
 
 #navbar-title {
-  margin: 0 10px;
+  margin-right: 5px;
   color: #fff;
 }
 
-
-/* SEARCH */
 
 #nav-search-wrapper {
   display: inline-block;
 }
 
+
+/* RESTAURANT SEARCH */
+
 #restaurant-search-wrapper {
   display: inline-block;
-  width: 100px; 
+  width: 200px; 
   vertical-align: middle;
 }
 
@@ -65,18 +70,24 @@ body {
   background-color: #e8e8e8;
 }
 
+#search-input-location {
+  display: inline-block;
+}
+
+
+/* LOCATION SEARCH */
+
+#edit-location-div {
+  width: 100%;
+  border-top: 1px solid #2E86C1;
+}
+
 #current-location-div a {
   color: #16405B;
 }
 
 #current-location-div a:hover {
   cursor: pointer;
-}
-
-#edit-location-div {
-  display: none;
-  width: 100%;
-  border-top: 1px solid #2E86C1;
 }
 
 #edit-location-div form {
@@ -90,13 +101,14 @@ body {
 }
 
 #current-location-div {
-  display: inline-block;
+  display: none;
+  color: #fff;
+  margin-left: 10px;  
 }
 
 #current-location-div #current-zip {
-  color: #fff;
-  padding: 0 10px;
   font-style: italic;
+  margin-right: 5px;
 }
 
 #current-location-btn {
@@ -117,12 +129,12 @@ body {
   color: #f39c12;
 }
 
-#location-input-wrapper {
-  margin-bottom: 5px;
-}
-
 #location-input-btn {
   margin-left: 15px;
+}
+
+#location-input-div {
+  display: inline-block;
 }
 
 
@@ -137,14 +149,15 @@ body {
 #menu li {
   list-style-type: none;
   display: inline;
+  padding: 20px 0 20px 10px;
 }
 
-#menu li a {
-  padding: 20px 10px;
+#menu li i {
   color: #eee;
+  font-size: 20px;
 }
 
-#menu li a:hover {
+#menu li:hover {
   cursor: pointer;
 }
 
@@ -180,18 +193,72 @@ body {
 
 /* REVIEW DATA */
 
-#wrapper-result {
-  display: none;
-  padding: 0;
-  margin-top: 50px;
+.card {
+  background-color: #fff;
+  padding: 10px;
+  /*border-radius: 4px;*/
+  border: 1px solid #f0f0f0;
+  margin-bottom: 10px;
+  width: 100%;
 }
 
-#food-item-div {
-  margin-top: 10px;
+#wrapper-result {
+  /*display: none;*/
+  padding: 0;
+  margin-top: 60px;
+}
+
+#wrapper-result > div {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+
+/* RESTAURANT RESULTS */
+
+#restaurant-results-div {
+  display: none;
+}
+
+#restaurant-results-div .restaurant-result {
+  min-height: 80px;
+  display: table;
+}
+
+#restaurant-results-div .restaurant-name {
+  display: table-cell;
+  color: #3498db;
+  vertical-align: middle;
+  width: auto;
+}
+
+#restaurant-results-div .restaurant-name h3 {
+  margin: 0;
+}
+
+#restaurant-results-div .restaurant-address {
+  display: table-cell;
+  vertical-align: middle;
+  width: 1px;
+  white-space: nowrap;
+}
+
+#restaurant-results-div .restaurant-address p {
+  margin-bottom: 0;
+}
+
+
+/* FOOD RESULTS */
+
+#picked-restaurant-div {
+  display: none;
+}
+
+#search-food-input {
+
 }
 
 #food-item-header {
-  margin-top: 10px;
   font-weight: bold;
   font-size: 50px;
   padding-right: 10px;
@@ -216,34 +283,36 @@ body {
 
 
 /* ERROR DIV */
+
 #error-div {
   display: none;
   margin-top: 280px;
 }
 
-
-@media (min-width : 590px) {
-  #navbar-title {
-    margin: 0 20px;
+@media (min-width: 490px) {
+  .container-fluid {
+    padding-left: 10px;
+    padding-right: 10px;
   }
 
+  #current-location-div {
+    display: inline-block;
+  }
+}
+
+@media (min-width : 610px) {
   #restaurant-search-wrapper {
     width: 300px;
   }
-
-  /*#search-box {
-    width: 300px;
-  }
-
-  #search-box i {
-    padding: 0 8px;
-  }*/
 }
 
 
 /* TABLETS AND UP */
 @media (min-width : 768px) {
-
+  .container-fluid {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
 }
 
 /* Medium devices (desktops, 992px and up) */

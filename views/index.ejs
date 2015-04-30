@@ -19,30 +19,24 @@
 	<body>
     	<!-- NAV BAR -->
     	<div id="navbar-container">
-		    <div id="navbar">
+		    <div id="navbar" class="container-fluid">
+		    	<!-- LOGO -->
 	    		<div id="navbar-title"><span>Yelpeees</span></div>
 
-	    		<!-- SEARCH BOX -->
-	    		<!-- <div id="search-box">
-		    		<div id="search-btn">
-		    			<i class="fa fa-search"></i>
-		    			<span id="search-btn-query">Search</span>
-	    			</div>
-				</div> -->
-
+	    		<!-- RESTAURANT SEARCH -->
 				<div id="nav-search-wrapper">
 					<div id="restaurant-search-wrapper">
-						<!-- RESTAURANT SEARCH -->
 						<div id="restaurant-search-div" class="input-group">
-					    	<input type="text" class="form-control" placeholder="Search for restaurant">
+					    	<input type="text" class="form-control" placeholder="Search for restaurant" id="restaurant-search-input">
 					    	<span class="input-group-btn">
-					        	<button class="btn btn-default" id="search-input-btn" type="button"><i class="fa fa-search"></i></button>
+					        	<button class="btn btn-default" id="search-restaurant-btn" type="button"><i class="fa fa-search"></i></button>
 					    	</span>
 				    	</div>
 			    	</div>
 
 			    	<!-- CURRENT LOCATION BUTTON -->
 			    	<div id="current-location-div">
+			    		<i class="fa fa-map-marker"></i>
 			    		<span id="current-zip"></span>
 			    		<a>Edit Location</a>
 	    			</div>
@@ -50,17 +44,15 @@
 
 				<!-- MENU ITEMS -->
 		    	<ul id="menu">
-		    		<li><a>Sign Up</a></li>
-					<li><a>Log in</a></li>
-					<li><a>Help</a></li>    		
+					<li><i class="fa fa-user"></i></li>  		
 		    	</ul>
 		    </div>
 
 		    <div id="edit-location-div">
 		    	<form class="form-horizontal">
-			    	<div class="form-group" id="location-input-wrapper">
+			    	<div class="form-group">
 		    			<label for="search-food-input" class="col-sm-1 control-label">Location</label>
-		    			<div class="col-sm-5">
+		    			<div class="col-sm-12 col-md-8" id="location-input-div">
 			    			<input type="text" class="form-control" id="search-input-location" 
 			    			placeholder="Type in your location or press the get location button">
 		    			</div>
@@ -83,23 +75,49 @@
 	    	<div id="error-div">
 		    	<div class='alert alert-warning' role='alert'>No reviews found!</div>
 	    	</div>
-		    
+
 		    <!-- RESULT DIV -->
 		    <div class="container-fluid" id="wrapper-result">
-				<!-- HEADER AND RATING -->
-				<div id="food-item-div">
-					<span id="food-item-header"></span>
-					<div id="progress-div">
-						<div class="progress">
-							<div class="progress-bar progress-bar-success" style="width: 65%"></div>
-							<div class="progress-bar progress-bar-danger" style="width: 35%"></div>
+		    	<!-- RESTAURANT RESULTS -->
+		    	<div id="restaurant-results-div" class="col-md-8 col-sm-12">
+		    		<!-- REMOVE BELOW -->
+		    		<div class="card restaurant-result">
+		    			<div class="restaurant-name">
+			    			<h3>Honest Tom's</h3>
+			    		</div>
+		    			<div class="restaurant-address">
+			    			<p>3290 Delancey St.</p>
+			    			<p>Philadelphia, PA 19104</p>
+		    			</div>
+		    		</div>
+		    	</div>
+
+				<!-- FOOD RATING DIV-->
+				<div id="picked-restaurant-div" class="col-md-8 col-sm-12">
+				    <!-- FOOD SEARCH -->
+				    <div id="food-search-div" class="input-group card">
+				    	<span><i class="fa fa-search"></i></span>
+				    	<input type="text" placeholder="Search for food" id="search-food-input">
+				    </div>
+
+				    <!-- FOOD RATING -->
+					<div class="card">
+						<span id="food-item-header">TEST</span>
+						<div id="progress-div">
+							<div class="progress">
+								<div class="progress-bar progress-bar-success" style="width: 65%"></div>
+								<div class="progress-bar progress-bar-danger" style="width: 35%"></div>
+							</div>
+							<span id="rating-span"><span id="sentiment-rating"></span>% rating from <span id="num-reviews"></span> reviews</span>
 						</div>
-						<span id="rating-span"><span id="sentiment-rating"></span>% rating from <span id="num-reviews"></span> reviews</span>
+					</div>
+
+					<!-- REVIEWS -->
+					<div id="reviews-div"></div>
+					<div class="col-md-4 col-sm-12">
+						<h3>Restaurant Info</h3>
 					</div>
 				</div>
-
-				<!-- REVIEWS -->
-				<div id="reviews-div"></div>
 		    </div>
 		</div>
 
