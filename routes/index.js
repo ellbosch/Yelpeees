@@ -314,7 +314,7 @@ function within10Miles(row, loc2, callback) {
 		if (err) {
 			callback(err, null);
 		} else {
-			if (!distanceData || distanceData.rows[0].elements[0].status != "OK") {
+			if (!distanceData || distanceData.rows.length == 0 || distanceData.rows[0].elements[0].status != "OK") {
 				callback(null, false);
 			} else {
 				// TEMPORARY 1000 mile radius until db fully loaded
