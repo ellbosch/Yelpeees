@@ -1,5 +1,8 @@
 $(function(){
 	var jqXHR;
+	var GLOBAL = {
+		location: ""
+	}
 
 	// find current location
 	get_current_location();
@@ -15,7 +18,8 @@ $(function(){
 					"address": address
 				},
 				success: function(data) {
-					cb(data.lat + "," + data.lng, data.zipcode);
+					var coords = data.lat + "," + data.lng;
+					cb(data.zipcode, coords);
 				},
 				error: function (xhr, ajaxOptions, thrownError) {
 					// console.log("error");
@@ -58,26 +62,6 @@ $(function(){
 		}
 	}
 
-	// FOR ELLA'S TESTIN PURPOSES
-
-	function search_businesses() {
-	$.ajax({
-				async: true,
-				url: "/searchBusinesses",
-				type: "POST",
-				data: {
-						"restaurant":  "domino",
-						"location": "39.952117099999995, -75.20109599999999"
-					},
-					success: function(data) {
-						console.log(data);
-					},
-					error: function (xhr, ajaxOptions, thrownError) {
-						console.log("error");
-					}
-			});
-		}
-
 	function show_current_location(data) {
 		var zip = data["zipcode"];
 		var address = data["address"];
@@ -102,13 +86,48 @@ $(function(){
 			if (input != undefined) {
 				var input_str = $(input).val().trim();
 
-				if (!input_str) {
+				if (!input_str || input_str == "Getting current location...") {
 					$(all_divs[i]).addClass("has-error");
+					$("#loading-screen").hide();
 					is_valid = false;
 				}
 			}
 		}
 		return is_valid;
+	}
+
+	// post request for business data
+	function request_business_data(restaurant, location) {
+		if (restaurant != "") {
+			$("#loading-screen").show();
+
+			jqXHR = $.ajax({
+				async: true,
+				url: "/searchBusinesses",
+				type: "POST",
+				dataType: "json",
+				data: {
+						"restaurant": restaurant,
+						"location": location
+					},
+					success: function(data) {
+						display_business_data(data.businesses);
+					},
+					error: function (xhr, ajaxOptions, thrownError) {
+						// console.log("error");
+					}
+			});
+		}
+	}
+
+	// displays business data
+	function display_business_data(data) {
+		$("#loading-screen").hide();
+		$("#restaurant-results-div").show();
+
+		for (var i = 0; i < data.length; i++) {
+			console.log(data[i]);
+		}
 	}
 
 	// displays food review data
@@ -142,13 +161,49 @@ $(function(){
 		$("#reviews-div").html(review_html);
 	}
 
+	// ensures valid location
+	function confirm_location(cb) {
+		// check if input is valid
+		var is_valid = check_for_valid_inputs($("#edit-location-div form"));
+
+		if (is_valid) {
+			var address = $("#search-input-location").val();
+			geocode(address, function(zip, coords) {
+				$("#current-zip").html(zip);
+				GLOBAL.location = coords;
+
+				if (cb != null) {
+					cb();
+				}
+			});
+			$("#edit-location-div").hide();
+		} else {
+			$("#edit-location-div").show();
+		}
+	}
+
 	// cancels query
 	function cancel_query() {
 		$("#loading-screen").hide();
 		$("#wrapper-result").hide();
 		jqXHR.abort();
 	}
+
+
+
 	
+	// event handler for getting businesses
+	$("#search-restaurant-btn").on('click keypress', function(e) {
+		e.preventDefault();
+
+		var input = $("#restaurant-search-input").val().trim();	// check if input is valid
+		$("#loading-screen").show();
+		confirm_location(function() {							// approve location
+			// below only happens if location gets confirmed
+			var location = GLOBAL.location;
+			request_business_data(input, location);
+		});
+	});
 
 	// show search inputs when search button is clicked
 	$("#current-location-div a").on('click', function() {
@@ -161,20 +216,10 @@ $(function(){
 	// event handler for saving custom location
 	$("#location-input-btn").on('click', function(e) {
 		e.preventDefault();
+		confirm_location();
+	});
 
-		// check if input is valid
-		var is_valid = check_for_valid_inputs($("#edit-location-div form"));
 
-		if (is_valid) {
-			var address = $("#search-input-location").val();
-			geocode(address, function(coords, zip) {
-				// DO SOMETHING WITH COORDS
-
-				$("#current-zip").html(zip);
-			});
-			$("#edit-location-div").hide();
-		}
-	})
 
 	// event handler for when a search is made
 	// $("#search-input-btn").on('click', function(event) {
