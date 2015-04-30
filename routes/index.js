@@ -27,10 +27,10 @@ exports.getBusinesses = function (req, res) {
 		if (err) {
 			console.log(err.stack);
 		} else {
-			var sqlBizName = "'%" + bizName.toLowerCase() + "%'";
+			var sqlBizName = "'%" + bizName.toLowerCase().replace(/[^\w\s]/g, '') + "%'";
 			connection.execute("SELECT * "
 				+			   "FROM businesses B "
-				+              "WHERE LOWER(B.name) LIKE " + sqlBizName, function(err, result) {
+				+              "WHERE REGEXP_REPLACE(LOWER(B.name), '/[^\w\s]/g') LIKE " + sqlBizName, function(err, result) {
 
 				if (err) {
 					console.log("error fetching matching business query");

@@ -172,7 +172,6 @@ $(function(){
 						"location": location
 					},
 					success: function(data) {
-						console.log(data.businesses);
 						display_business_data(data.businesses);
 					},
 					error: function (xhr, ajaxOptions, thrownError) {
@@ -188,7 +187,16 @@ $(function(){
 		$("#restaurant-results-div").show();
 
 		for (var i = 0; i < data.length; i++) {
-			console.log(data[i][2]);
+			var name = data[i][1];
+			var address_arr = data[i][2].split(", ");
+			var address_1 = address_arr[0];
+			var address_2 = address_arr[1] + ", " + address_arr[2];
+			var str =	"<div class='card restaurant-result'>"
+							+ "<div class='restaurant-name'><h3>"
+							+ name.toUpperCase() + "</div><div class='restaurant-address'>"
+							+ "<p>" + address_1 + "</p><p>" + address_2 + "</p>"
+							+ "</div></div>"
+			$("#restaurant-results-div").append(str);
 		}
 	}
 

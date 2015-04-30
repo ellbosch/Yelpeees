@@ -241,6 +241,7 @@ body {
   vertical-align: middle;
   width: 1px;
   white-space: nowrap;
+  width: 250px;
 }
 
 #restaurant-results-div .restaurant-address p {
