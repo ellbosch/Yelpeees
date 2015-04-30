@@ -85,6 +85,8 @@ $(function(){
 			});
 		}
 
+	//	search_reviews();
+
 	function search_reviews() {
 		$.ajax({
 			async: true,

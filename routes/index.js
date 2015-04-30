@@ -45,7 +45,18 @@ exports.init = function(callback) {
 };
 
 exports.index = function(req, res) {
-	res.render('index');
+	if (req.session.userid) {
+		getHistory(userid, function(err, history) {
+			if (err) {
+				console.log(err);
+				res.render('index', {loggedIn:true, userName:'', history:[]});
+			} else {
+				res.render('index', {loggedIn:true, userName:'', history:history});
+			}
+		});
+	} else {
+		res.render('index', {loggedIn:false, userName:''});
+	}
 }
 
 exports.login = function(req, res) {
@@ -230,27 +241,6 @@ exports.getGeocode = function(req, res) {
 	});
 }
 
-exports.getHistory = function(req, res) {
-	if (req.session.userid) {
-		var userId = req.session.userid;
-		console.log("userid " + userId);
-		oracledb.getConnection(oracleConnectInfo, function(err, connection) {
-			connection.execute("SELECT * FROM history H WHERE H.userid = :userid", [userId], function(err, result) {
-				if (err) {
-					console.log(err);
-					res.send({success:false, message:"Error fetching user history."});
-				} else {
-					var rows = result.rows;
-					res.send({success:true, data:rows.slice(Math.min(10, rows.length - 1))});
-				}
-			});
-		});
-	}
-	else {
-		res.send({success:false, message:"No user logged in."});
-	}
-}
-
 
 exports.getReviewsAndRating = function (req, res) {
 	oracledb.getConnection(oracleConnectInfo, function(err, connection) {
@@ -338,16 +328,23 @@ exports.getReviewsAndRating = function (req, res) {
 	});
 }
 
-exports.getHistory = function(req, res) {
-	var userId = req.session.userid;
+function getHistory(userId, callback) {
 	oracledb.getConnection(oracleConnectInfo, function(err, connection) {
-		connection.execute("SELECT * FROM history H WHERE H.user_id = :uid", [userId], function(err, result) {
+		connection.execute("SELECT * FROM history H WHERE H.user_id = :uid ORDER BY H.time desc", [userId], function(err, result) {
 			if (err) {
 				console.log(err);
 				res.send({success:false, message:"Error fetching user history."});
 			} else {
 				var rows = result.rows;
-				res.send({success:true, data:rows.slice(Math.min(10, rows.length - 1))});
+				connection.release(function(err) {
+					if (err) {
+						console.log("error getting history: " + err);
+						callback(err, null);
+					} else {
+						console.log(result.rows);
+						callback(null, rows.slice(Math.min(10, rows.length - 1)));
+					}
+				});
 			}
 		});
 	});
@@ -423,13 +420,28 @@ exports.signup = function(req, res) {
 
 
 function updateUserHistory(connection, userId, businessId, food, callback) {
-	connection.execute("INSERT /*+ ignore_row_on_dupkey_index(userid, food_item, business_id) */ INTO history VALUES (:userid, :food_item, :business_id)",
-						[userId, food, businessId], {isAutoCommit: true}, function(err, result) {
+	connection.execute("SELECT name FROM businesses WHERE business_id = " + "'" + businessId + "'", function(err, result) {
 		if (err) {
-			console.log("error updating user history");
+			console.log(err);
 			callback(err, null);
-		}	else {
-			callback(null, {success:true});
+		} else {
+			var rows = result.rows;
+			if (rows.length == 1) {
+				var name = rows[0][0];
+				var time = (new Date).getTime();				
+				connection.execute("INSERT INTO history VALUES (:userid, :food_item, :business_id, :name, :time)",
+						[userId, food, businessId, name, time], {isAutoCommit: true}, function(err, result) {
+					if (err) {
+						console.log("error updating user history");
+						callback(err, null);
+					}	else {
+						callback(null, {success:true});
+					}
+				});
+			} else {
+				console.log("no business name");
+				callback(1, null);
+			}
 		}
 	});
 }

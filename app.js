@@ -35,7 +35,6 @@ routes.init(function() {
 	app.post('/log_in', routes.validateUser);
 	app.get('/login', routes.login);
 	app.get('/signup', routes.signup);
-	app.post('/getHistory', routes.getHistory);
 	/////////////////////
 
 	http.createServer( app ).listen( app.get( 'port' ), function(){
