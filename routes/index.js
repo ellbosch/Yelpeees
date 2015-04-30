@@ -12,69 +12,11 @@ exports.init = function(callback) {
 	callback();
 };
 
-/**
- * Default index page fetches some content and returns it
- */
-exports.example = function(req, res) {
-	res.render('example');
-	return;
-}
-
 exports.index = function(req, res) {
 	res.render('index');
 }
 
-exports.populateSearchResults = function(req, res) {
-	if (! req.session.search_results) {
-		res.render('/');
-	}
-	else {
-		res.render('search', {results: JSON.stringify(req.session.search_results)});
-	}
-}
 
-function getCloseBusinesses(rows, location, callback) {
-	var result = [];
-	var count = 0;
-	var check = rows.length;
-	for (var i = 0; i < rows.length; i++) {
-		(function(row) {
-			within10Miles(rows[row], location, function(err, isClose) {
-				if (err) {
-					console.log(err);
-					callback(err, null);
-				} else {
-					if (isClose) {
-						result.push(rows[row]);
-						if (row == rows.length - 1) {
-							callback(null, result);
-						}
-					} else {
-						if (row == rows.length - 1) {
-						callback(null, result);
-						}
-					}
-				}
-			});
-		})(i);
-	}
-}
-
-function within10Miles(row, loc2, callback) {
-	var loc1 = row[3] + ", " + row[4];
-	gm.distance(loc1, loc2, function(err, distanceData) {
-		if (err) {
-			callback(err, null);
-		} else {
-			if (!distanceData || distanceData.rows[0].elements[0].status != "OK") {
-				callback(null, false);
-			} else {
-				// TEMPORARY 1000 mile radius until db fully loaded
-				callback(null, parseFloat(distanceData.rows[0].elements[0].distance.text.split(" ")[0].replace(/,/g, '')) < 1609.34);
-			}
-		}
-	});
-}
 
 exports.getBusinesses = function (req, res) {
 	console.log("getting businesses");
@@ -110,11 +52,151 @@ exports.getBusinesses = function (req, res) {
 	});
 }
 
-<<<<<<< HEAD
+
+function getBusinessInfo(businessId, callback) {
+	oracledb.getConnection(oracleConnectInfo, function(err, connection) {
+		if (err) {
+			console.log("error connecting to db");
+			callback(err, null);
+		} else {
+			connection.execute("SELECT B.name, B.address FROM businesses B WHERE business_id = " + "'" + businessId + "'", 
+				function(err, result) {
+					var info = result.rows;
+					callback(null, info[0]);
+			});
+		}
+	});
+}
+
+function getCloseBusinesses(rows, location, callback) {
+	var result = [];
+	var count = 0;
+	var check = rows.length;
+	for (var i = 0; i < rows.length; i++) {
+		(function(row) {
+			within10Miles(rows[row], location, function(err, isClose) {
+				if (err) {
+					console.log(err);
+					callback(err, null);
+				} else {
+					if (isClose) {
+						result.push(rows[row]);
+						if (row == rows.length - 1) {
+							callback(null, result);
+						}
+					} else {
+						if (row == rows.length - 1) {
+						callback(null, result);
+						}
+					}
+				}
+			});
+		})(i);
+	}
+}
+
+exports.getGeocode = function(req, res) {
+	var address = req.body.address;
+
+	gm.geocode(address, function(err, data){
+		if (err) {
+			throw err;
+		}
+		var location = data.results[0].geometry.location;
+		var zip = getZipcode(data.results[0].formatted_address);
+		res.send(JSON.stringify({lat: location.lat, lng: location.lng, zipcode: zip}));
+	});
+}
 
 
- exports.getReviews = function (req, res) {
-=======
+
+exports.getReviewsAndRating = function (req, res) {
+	oracledb.getConnection(oracleConnectInfo, function(err, connection) {
+		if (err) {
+			console.log(err.stack);
+		}
+		var restaurantId = req.body.businessId;
+		req.session.business_id = restaurantId;
+		var food = req.body.food;
+		var sqlRestaurant = "'" + restaurantId + "'";
+		var sqlFood = "'%" + food.toLowerCase() + "%'";
+		//var userId = req.session.userid;
+		var userId = 1;
+		updateUserHistory(userId, restaurantId, food, function(err, success) {
+			if (err) {
+				console.log(err);
+				res.send({success:false, message: "Error updating user history. Please try again"});
+			} else {
+				connection.execute("SELECT R.text, R.stars, R.rdate "
+					+ 			   "FROM reviews R "
+					+              "WHERE R.business_id = " + sqlRestaurant + " AND LOWER(R.text) LIKE " + sqlFood
+
+									, function(err, reviewsResult) {
+					if (err) {
+						console.log("error executing reviews query");
+						console.log(err);
+						res.send({success:false, message: "Error querying the database for that food item. Please try again."});
+					} else {
+						connection.execute("SELECT T.text, T.tdate "
+					+ 			   "FROM tips T "
+					+              "WHERE T.business_id = " + sqlRestaurant + " AND LOWER(T.text) LIKE " + sqlFood
+								, function(err, tipsResult) {
+							if (err) {
+								console.log(err);
+								res.send({success:false, message: "Error querying the database for that food item. Please try again."});
+							} else {
+								var reviews = reviewsResult.rows;
+								var tips = tipsResult.rows;
+								console.log(tips);
+								var result = [];
+								var reviewTexts = [];
+								var sumStars = 0;
+								if (reviews.length == 0) {
+									res.send({success:false, message: "There were no reviews that matched your query. Please try another food item."});
+								} else {
+									for (var i = 0; i < reviews.length; i++) {
+										reviewTexts.push(reviews[i][0]);
+										console.log(reviews[i][1]);
+										sumStars += parseInt(reviews[i][1]);
+										if (i == reviews.length - 1) {
+											if (tips.length == 0) {
+												console.log(reviewTexts);
+												var result = JSON.stringify({reviews:reviewTexts, sentiment:sentimentAnalysis(reviewTexts, food), avgStars:sumStars/reviews.length});
+												console.log(result);
+												res.send(JSON.stringify({success: true, data: result}));
+											} else {
+												for (var j = 0; j < tips.length; j++) {
+													console.log("populating tips");
+													reviewTexts.push(tips[j][0]);
+													if (j == tips.length - 1) {
+														connection.release(function(err) {
+															if (err) {
+																console.log("error releasing db connection in getReviewsAndRating");
+																console.log(err);
+																res.send({success:false, message: "Error querying the database for that food item. Please try again."});
+															} else {
+																var result = {reviews:reviewTexts, sentiment:sentimentAnalysis(reviewTexts, food), avgStars:sumStars/reviews.length};
+																console.log(result);
+																res.send(JSON.stringify({success: true, data: result}));
+															}
+														});
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						});
+					}
+				});
+			}
+		});
+
+	});
+}
+
+
 exports.getReverseGeocode = function(req, res) {
 	var coords = req.body.coords;
 
@@ -123,13 +205,13 @@ exports.getReverseGeocode = function(req, res) {
 			throw err;
 		}
 	  	var ad = data.results[0].formatted_address;
-	  	var zip = get_zipcode(ad);
+	  	var zip = getZipcode(ad);
 	  	res.send(JSON.stringify({zipcode: zip, address: ad}));
 	});
 }
 
 // get zipcode from address
-function get_zipcode(ad) {
+function getZipcode(ad) {
 	var zip = "";
 	var ad_split = ad.split(" ");
   	if (ad_split.length > 2) {
@@ -141,94 +223,17 @@ function get_zipcode(ad) {
 	return zip;
 }
 
-exports.getGeocode = function(req, res) {
-	var address = req.body.address;
 
-	gm.geocode(address, function(err, data){
-		if (err) {
-			throw err;
-		}
-		var location = data.results[0].geometry.location;
-		var zip = get_zipcode(data.results[0].formatted_address);
-		res.send(JSON.stringify({lat: location.lat, lng: location.lng, zipcode: zip}));
-	});
+exports.populateSearchResults = function(req, res) {
+	if (! req.session.search_results) {
+		res.render('/');
+	}
+	else {
+		res.render('search', {results: JSON.stringify(req.session.search_results)});
+	}
 }
 
-exports.getReviews = function (req, res) {
->>>>>>> 3cdddc2a288d822032ce7b65a758f02be2479b43
-	oracledb.getConnection(oracleConnectInfo, function(err, connection) {
-		if (err) {
-			console.log(err.stack);
-		}
-		var location = req.body.location;
-		var restaurant = req.body.restaurant;
-		var food = req.body.food;
-		var sqlRestaurant = "'%" + restaurant.toLowerCase() + "%'";
-		var sqlFood = "'%" + food.toLowerCase() + "%'";
-		connection.execute("SELECT B.name, B.address, R.text, R.stars, R.rdate "
-			+ 			   "FROM businesses B, reviews R "
-			+              "WHERE B.business_id = R.business_id AND LOWER(B.name) LIKE " + sqlRestaurant + " AND LOWER(R.text) LIKE " + sqlFood
-			+              " ORDER BY B.business_id" , 
-
-							{}, {outFormat: oracledb.OBJECT}, function(err, reviewsResult) {
-			if (err) {
-				console.log("error executing business query");
-				console.log(err);
-			} 
-			else {
-				connection.execute("SELECT B.name, B.address, T.text, T.tdate "
-			+ 			   "FROM businesses B, tips T "
-			+              "WHERE B.business_id = T.business_id AND LOWER(B.name) LIKE " + sqlRestaurant + " AND LOWER(T.text) LIKE " + sqlFood
-			+ 			   " ORDER BY B.business_id" , 
-
-							{}, {outFormat: oracledb.OBJECT}, function(err, tipsResult) {
-
-					var reviews = reviewsResult.rows;
-					var tips = tipsResult.rows;
-					var firstId = reviews[0].BUSINESS_ID;
-					var reviewSet = [];
-					var result = [];
-					var i, j, count = 0;
-					console.log("starting to search the reviews");
-					while (i < reviews.length && j < tips.length) {
-						console.log("populating results");
-						var name = reviews[i].NAME;
-						var address = reviews[i].ADDRESS;
-						count = 0;
-						while (reviews[i].BUSINESS_ID == firstId) {
-							console.log("looping through reviews");
-							reviewSet.push(reviews[i].TEXT);
-							i++;
-							count++;
-						}
-						while (j < tips.length && tips[j].BUSINESS_ID == firstId) {
-							reviewSet.push(tips[j].TEXT);
-							j++;
-							count++;
-						}
-						if (reviewSet.length > 0) {
-							result.push(JSON.stringify({"business_name":name, "address":address, "rating":sentiment_analysis(reviewSet, food.toLowerCase()), "num_reviews":count}));
-						}
-						if (i < reviews.length) {
-							firstId = reviews[i].BUSINESS_ID;
-						}
-					}	
-					
-					connection.release(function(err) {
-						if (err) {
-							console.log(err);
-							res.render('index');
-						} 
-						req.session.search_results = reviewsResult.rows;
-						res.send(JSON.stringify({success: true, data: result}));
-					});
-				});
-			}
-		});
-	});
-}
-
-function sentiment_analysis(reviews, term) {
+function sentimentAnalysis(reviews, term) {
 
 	var sentiments = [];
 	var minSentiment = Number.MAX_VALUE;
@@ -281,8 +286,40 @@ function analyzeReview(review, searchTerm){
     return avg;
 }
 
-exports.sentiment_analysis = function(req, res) {
-	text = req.body.text;
-	result = sentiment(text);
-	res.send({result: result, success: true});
+
+function updateUserHistory(userId, businessId, food, callback) {
+	oracledb.getConnection(oracleConnectInfo, function(err, connection) {
+		if (err) {
+			console.log(err.stack);
+			callback(err, null);
+		} else {
+			connection.execute("INSERT INTO history (userid, food_item, business_id) "
+						+ 		"VALUES ('" + userId + "', '" + food + "', '" + businessId + "')" 
+							, function(err, result) {
+				if (err) {
+					callback(err, null);
+				}	else {
+					callback(null, {success:true});
+				}				
+
+			});
+		}
+	});
+}
+
+
+function within10Miles(row, loc2, callback) {
+	var loc1 = row[3] + ", " + row[4];
+	gm.distance(loc1, loc2, function(err, distanceData) {
+		if (err) {
+			callback(err, null);
+		} else {
+			if (!distanceData || distanceData.rows.length == 0 || distanceData.rows[0].elements[0].status != "OK") {
+				callback(null, false);
+			} else {
+				// TEMPORARY 1000 mile radius until db fully loaded
+				callback(null, parseFloat(distanceData.rows[0].elements[0].distance.text.split(" ")[0].replace(/,/g, '')) < 1609.34);
+			}
+		}
+	});
 }
