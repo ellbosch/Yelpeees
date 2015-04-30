@@ -82,14 +82,14 @@ $(function() {
 			});
 		}
 
-	function search_reviews() {
+	function search_reviews(business_id, food_input) {
 		$.ajax({
 			async: true,
 			url: "/search",
 			type: "POST",
 			data: {
-				"businessId":  "OrTArReTvdVxEKBAxsz3Ww",
-				"food": "mashed potatoes"
+				"businessId":  business_id,
+				"food": food_input
 			}, success: function(data) {
 					console.log(data);
 			}, error: function (xhr, ajaxOptions, thrownError) {
@@ -179,11 +179,12 @@ $(function() {
 		$("#restaurant-results-div").show();
 
 		for (var i = 0; i < data.length; i++) {
+			var id = data[i][0];
 			var name = data[i][1];
 			var address_arr = data[i][2].split(", ");
 			var address_1 = address_arr[0];
 			var address_2 = address_arr[1] + ", " + address_arr[2];
-			var str =	"<div class='card restaurant-result'>"
+			var str =	"<div class='card restaurant-result' data-id=" + id + ">"
 							+ "<div class='restaurant-name'><h3>"
 							+ name.toUpperCase() + "</div><div class='restaurant-address'>"
 							+ "<p>" + address_1 + "</p><p>" + address_2 + "</p>"
@@ -297,6 +298,8 @@ $(function() {
 
 	// event handler for selecting a restaurant
 	$("#wrapper-result #restaurant-results-div").on('click', ".restaurant-result", function() {
+		var business_id = $(this).attr("data-id");
+		console.log(business_id);
 		var business_name = $(this).find(".restaurant-name").text();
 		var addr_1 = $(this).find(".restaurant-address p:first-child").text();
 		var addr_2 = $(this).find(".restaurant-address p:nth-child(2)").text();
@@ -304,10 +307,18 @@ $(function() {
 		$("#restaurant-results-div").hide();
 		$("#picked-restaurant-div").show();
 
+		$("#restaurant-info-div").attr("data-id", business_id);
 		$("#restaurant-info-div h3").html(business_name);
 		$("#restaurant-info-div #addr_line1").html(addr_1);
 		$("#restaurant-info-div #addr_line2").html(addr_2);
 	});
+
+	// event handler for searching for food
+	$("#search-food-input").keypress(function(e) {
+		if(e.which == 13) {
+			// $("#")
+		}
+	})
 
 	// event handler for canceling loads
 	$("#cancel-load").on('click', function() {

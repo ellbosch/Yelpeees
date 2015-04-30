@@ -246,6 +246,11 @@ body {
   display: table;
 }
 
+#restaurant-results-div .restaurant-result:hover {
+  background-color: rgba(240, 240, 240, 0.9);
+  cursor: pointer;
+}
+
 #restaurant-results-div .restaurant-name {
   display: table-cell;
   color: #3498db;
@@ -277,7 +282,9 @@ body {
 }
 
 #search-food-input {
-
+  width: 90%;
+  margin-left: 10px;
+  border: 0;
 }
 
 #food-item-header {
@@ -301,6 +308,10 @@ body {
   font-size: 12px;
   font-style: italic;
   color: #777;
+}
+
+#addr_line1 {
+  margin: 0;
 }
 
 
