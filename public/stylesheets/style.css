@@ -7,6 +7,28 @@ body {
   padding-right: 5px;
 }
 
+
+/* LOGIN & SIGNUP */
+
+.card-account h2 {
+  margin: 0;
+  font-weight: bold;
+}
+
+.card-account {
+  width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 100px;
+}
+
+.account-error {
+  color: red;
+  font-style: italic;
+  font-weight: bold;
+  text-align: center;
+}
+
 /* NAV */
 
 #navbar-container {
@@ -152,9 +174,8 @@ body {
   padding: 20px 0 20px 10px;
 }
 
-#menu li i {
-  color: #eee;
-  font-size: 20px;
+#menu li a {
+  color: #16405B;
 }
 
 #menu li:hover {

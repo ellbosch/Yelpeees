@@ -8,17 +8,27 @@
 		<!-- BOOTSTRAP -->
 		<link rel="stylesheet" type="text/css" href="stylesheets/bootstrap.min.css">
 		<link rel="stylesheet" type="text/css" href="../public/stylesheets/bootstrap.min.css">
-		<!-- FONT AEWESOME ICONS -->
-		<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+		<!-- CUSTOM STYLES -->
+		<link rel="stylesheet" type="text/css" href="stylesheets/style.css">
+		<link rel="stylesheet" type="text/css" href="../public/stylesheets/style.css">
 	</head>
 	<body>
-		<form action="/log_in" method="post">
-			Username:
-			<input type="text" name="username"/> <br/>
-			Password:
-			<input type="password" name="password"/> <br/>
-			<input type="submit" value="Submit"/> <br/> <br/>
-			<div style="color: #ff0000"><%= error %></div>
-		</form>
+		<div class="card-account">
+			<div class="card"><h2>Log In</h2></div>
+			<div class="account-error"><%= error %></div>
+			<div class="card">
+				<form action="/log_in" method="post" id="login-form">
+					<div class="form-group">
+					    <label for="username-input">Username</label>
+					    <input type="text" name="username" class="form-control" id="username-input" placeholder="Username">
+					</div>
+					<div class="form-group">
+					    <label for="password-input">Password</label>
+					    <input type="password" name="password" class="form-control" id="password-input" placeholder="Password">
+					</div>
+					<button type="submit" class="btn btn-default" id="login-btn">Submit</button>
+				</form>
+			</div>
+		</div>
 	</body>
 </html>
