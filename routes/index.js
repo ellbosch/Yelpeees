@@ -230,6 +230,26 @@ exports.getGeocode = function(req, res) {
 	});
 }
 
+exports.getHistory = function(req, res) {
+	if (req.session.userid) {
+		var userId = req.session.userid;
+		console.log("userid " + userId);
+		oracledb.getConnection(oracleConnectInfo, function(err, connection) {
+			connection.execute("SELECT * FROM history H WHERE H.userid = :userid", [userId], function(err, result) {
+				if (err) {
+					console.log(err);
+					res.send({success:false, message:"Error fetching user history."});
+				} else {
+					var rows = result.rows;
+					res.send({success:true, data:rows.slice(Math.min(10, rows.length - 1))});
+				}
+			});
+		});
+	}
+	else {
+		res.send({success:false, message:"No user logged in."});
+	}
+}
 
 
 exports.getReviewsAndRating = function (req, res) {

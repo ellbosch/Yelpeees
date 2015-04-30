@@ -104,8 +104,9 @@ $(function(){
 
 
 
-	search_businesses();
+	// search_businesses();
 
+	// search_reviews();
 	function search_reviews() {
 		$.ajax({
 			async: true,
@@ -122,6 +123,24 @@ $(function(){
 			});
 		}
 
+	// convert address into coordinates
+	function getHistory() {
+		console.log("history");
+		$.ajax({
+			async: true,
+			url: "/getHistory",
+			type: "POST",
+			success: function(data) {
+				console.log("history results");
+				console.log(data);
+			},
+			error: function (xhr, ajaxOptions, thrownError) {
+				console.log(xhr.error);
+			}
+		});
+	}
+
+	getHistory();
 
 	function show_current_location(data) {
 		var zip = data["zipcode"];
