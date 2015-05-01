@@ -494,10 +494,10 @@ function within10Miles(row, loc2, callback) {
 	var loc1 = row[3] + ", " + row[4];
 	
 	// FOR LIMITING API CALLS
-	callback(null, true);
+	// callback(null, true);
 
 	// ADD THIS BACK FOR DEMO
-	/*gm.distance(loc1, loc2, function(err, distanceData) {
+	gm.distance(loc1, loc2, function(err, distanceData) {
 		if (err) {
 			callback(err, null);
 		} else {
@@ -509,5 +509,5 @@ function within10Miles(row, loc2, callback) {
 				callback(null, parseFloat(distanceData.rows[0].elements[0].distance.text.split(" ")[0].replace(/,/g, '')) < 1609.34);
 			}
 		}
-	});*/
+	});
 }
