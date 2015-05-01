@@ -74,7 +74,7 @@ $(function() {
 					"location": "39.952117099999995, -75.20109599999999"
 				},
 				success: function(data) {
-					console.log(data);
+					// console.log(data);
 				},
 				error: function (xhr, ajaxOptions, thrownError) {
 					console.log("error");
@@ -94,9 +94,7 @@ $(function() {
 			}, success: function(data) {
 				if (data.success) {
 					var parsed_data = JSON.parse(data.data)
-					console.log(parsed_data);
 					var reviews = parsed_data.reviews;
-					console.log("REVIEWS (from data): " + reviews);
 					var sentiment = parsed_data["sentiment"]["avg"];
 					display_review_data(food_input, reviews, sentiment);
 				} else {
@@ -110,10 +108,6 @@ $(function() {
 
 	// displays food review data
 	function display_review_data(food_input, reviews, sentiment_rating) {
-		console.log(typeof reviews);
-
-
-
 		$("#loading-screen").hide();		// hide loading screen
 		$("#food-rating-div").show();			// show food-item-div if it is not already showing
 		$("#reviews-div").show();
@@ -140,14 +134,13 @@ $(function() {
 
 	// convert address into coordinates
 	function getHistory() {
-		console.log("history");
 		$.ajax({
 			async: true,
 			url: "/getHistory",
 			type: "POST",
 			success: function(data) {
-				console.log("history results");
-				console.log(data);
+				// console.log("history results");
+				// console.log(data);
 			},
 			error: function (xhr, ajaxOptions, thrownError) {
 				console.log(xhr.error);
@@ -221,6 +214,7 @@ $(function() {
 		$("#food-rating-div").hide();
 		$("#reviews-div").hide();
 		$("#restaurant-results-div").html("<h4>Select Your Restaurant:</h4>");
+		$("#splash-page-div").hide();
 
 		for (var i = 0; i < data.length; i++) {
 			var id = data[i][0];
@@ -291,7 +285,7 @@ $(function() {
 	// show search inputs when search button is clicked
 	$("#current-location-div a").on('click', function() {
 		$("#edit-location-div").toggle();
-		$(".history").css({"padding-top": "100px"});
+		// $(".history").css({"padding-top": "100px"});
 	});
 
 	// event handler for getting current location
@@ -299,7 +293,7 @@ $(function() {
 
 	// event handler for saving custom location
 	$("#location-input-btn").on('click', function(e) {
-		$(".history").css({"padding-top": "5px"});
+		// $(".history").css({"padding-top": "5px"});
 		e.preventDefault();
 		confirm_location();
 	});

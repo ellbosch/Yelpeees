@@ -1,7 +1,7 @@
 body {
   background-color: #f6f6f6;
-  background-image: url("../northern-lights.jpg");
-  background-size: cover;
+  /*background-image: url("../northern-lights.jpg");
+  background-size: cover;*/
 }
 
 .container-fluid {
@@ -9,6 +9,44 @@ body {
   padding-right: 5px;
 }
 
+.col-md-8, .col-md-4, .col-sm-12 {
+  padding: 0;
+}
+
+
+/* SPLASH PAGE */
+
+#splash-page-div {
+  position: absolute;
+  top: 50px;
+  bottom: 0;
+}
+
+#splash-page-img {
+  height: 100%;
+  width: auto;
+}
+
+#history-div {
+  color: #C0CFDA;
+  padding: 20px;
+  position: absolute;
+  bottom: 20px;
+  margin-left: 10px;
+  overflow: scroll;
+  top: 130px;
+  background-color: rgba(10, 10, 10, 0.4);
+  border: 1px solid rgba(0, 0, 0, 0.4);
+}
+
+#history-div h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.hist {
+  margin-bottom: 5px;
+}
 
 /* LOGIN & SIGNUP */
 
@@ -153,10 +191,6 @@ body {
   color: #f39c12;
 }
 
-#location-input-btn {
-  margin-left: 15px;
-}
-
 #location-input-div {
   display: inline-block;
 }
@@ -223,7 +257,6 @@ body {
 .card {
   background-color: #fff;
   padding: 10px;
-  /*border-radius: 4px;*/
   border: 1px solid #f0f0f0;
   margin-bottom: 10px;
   width: 100%;
@@ -245,7 +278,6 @@ body {
 
 #restaurant-results-div {
   display: none;
-  color: #C0CFDA;
 }
 
 #restaurant-results-div .restaurant-result {
@@ -281,22 +313,11 @@ body {
   margin-bottom: 0;
 }
 
-.history {
-  padding-top: 100px;
-  color: #C0CFDA;
-  padding-left: 15px;
-}
-
-.hist {
-  padding-left: 5px;
-}
-
 
 /* FOOD RESULTS */
 
 #picked-restaurant-div {
   display: none;
-  color: #C0CFDA;
 }
 
 #search-food-input {
@@ -333,6 +354,14 @@ body {
   color: #777;
 }
 
+#restaurant-info-div {
+  padding-left: 10px;
+}
+
+#restaurant-info-div h3 {
+  margin-top: 0;
+}
+
 #addr_line1 {
   margin: 0;
 }
@@ -345,7 +374,7 @@ body {
   margin-top: 280px;
 }
 
-@media (min-width: 490px) {
+@media (min-width : 490px) {
   .container-fluid {
     padding-left: 10px;
     padding-right: 10px;
@@ -368,6 +397,14 @@ body {
   .container-fluid {
     padding-left: 15px;
     padding-right: 15px;
+  }
+}
+
+/* FOR SPLASH PAGE */
+@media (min-width : 1200px) {
+  #splash-page-img {
+    width: 100%;
+    height: auto;
   }
 }
 

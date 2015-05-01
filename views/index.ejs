@@ -57,7 +57,7 @@
 		    	<form class="form-horizontal">
 			    	<div class="form-group">
 		    			<label for="search-food-input" class="col-sm-1 control-label">Location</label>
-		    			<div class="col-sm-12 col-md-8" id="location-input-div">
+		    			<div class="col-sm-10 col-md-8" id="location-input-div">
 			    			<input type="text" class="form-control" id="search-input-location" placeholder="Type in your location or press the get location button">
 		    			</div>
 		    			<div id="current-location-btn" title="Get current location">
@@ -71,6 +71,20 @@
 		    		</div>
 		    	</form>
 		    </div>
+	    </div>
+
+	    <div id="splash-page-div">
+		    <img src="../northern-lights.jpg" id="splash-page-img">
+
+		    <!-- HISTORY -->
+		    <% if (loggedIn && history.length > 0) { %>
+		    <div id="history-div">
+		    	<h3>History</h3>
+		    	<% for (var i = 0; i < history.length; i++) { %>
+		    		<div class="hist"> <%= history[i][1].charAt(0).toUpperCase() + history[i][1].toLowerCase().substring(1, history[i][1].length) %> at <%= history[i][3] %> </div>
+		    	<% } %>
+		    </div>
+			<% } %>
 	    </div>
  
 	    <div class="container-fluid" id="container-div">
@@ -115,22 +129,13 @@
 					</div>
 
 					<!-- REVIEWS -->
-					<div id="reviews-div" class="col-md-8 col-sm-12 card">
-						<div id="reviews-text-div"></div>
+					<div id="reviews-div" class="col-md-8 col-sm-12">
+						<div id="reviews-text-div" class="card"></div>
 					</div>
 
 				</div>
 		    </div>
 		</div>
-
-		<% if (loggedIn && history.length > 0) { %>
-		    <div class="history">
-		    	<h3>History</h3>
-		    	<% for (var i = 0; i < history.length; i++) { %>
-		    		<div class="hist"> <%= history[i][1].charAt(0).toUpperCase() + history[i][1].toLowerCase().substring(1, history[i][1].length) %> at <%= history[i][3] %> </div>
-		    	<% } %>
-		    </div>
-		<% } %>
 
 		<!-- LOADING SCREEN -->
 		<div id="loading-screen">

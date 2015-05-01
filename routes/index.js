@@ -143,7 +143,6 @@ exports.init = function(callback) {
 };
 
 exports.getBusinesses = function (req, res) {
-	console.log("getting businesses");
 	var bizName = req.body.restaurant;
 	var location = req.body.location;
 	oracledb.getConnection(oracleConnectInfo, function(err, connection) {
@@ -165,7 +164,6 @@ exports.getBusinesses = function (req, res) {
 						if (err) {
 							console.log(err);
 						} else {
-							//console.log("sending back businesses: " + closeOnes);
 							res.send({success:true, businesses:closeOnes.slice(0, Math.min(10, closeOnes.length - 1))});
 						}
 					});
