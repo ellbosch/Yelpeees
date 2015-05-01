@@ -214,6 +214,10 @@ body {
 }
 
 
+#reviews-text-div {
+  color: #041042;
+}
+
 /* REVIEW DATA */
 
 .card {
@@ -241,7 +245,7 @@ body {
 
 #restaurant-results-div {
   display: none;
-  color: #B3CEE1;
+  color: #C0CFDA;
 }
 
 #restaurant-results-div .restaurant-result {
@@ -292,7 +296,7 @@ body {
 
 #picked-restaurant-div {
   display: none;
-  color: #B3CEE1;
+  color: #C0CFDA;
 }
 
 #search-food-input {
@@ -303,6 +307,7 @@ body {
 
 #food-rating-div {
   display: none;
+  color: #041042;
 }
 
 #food-item-header {

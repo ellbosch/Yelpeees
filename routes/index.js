@@ -48,6 +48,7 @@ exports.index = function(req, res) {
 				console.log(err);
 				res.render('index', {loggedIn:true, userName:'', history:[]});
 			} else {
+				console.log("History in index: " + history);
 				res.render('index', {loggedIn:true, userName:'', history:history});
 			}
 		});
@@ -333,7 +334,7 @@ function getHistory(userId, callback) {
 						callback(err, null);
 					} else {
 						console.log(rows);
-						callback(null, rows.slice(Math.min(10, rows.length - 1)));
+						callback(null, rows.slice(0, Math.min(10, rows.length - 1)));
 					}
 				});
 			}
