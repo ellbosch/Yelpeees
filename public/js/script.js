@@ -98,7 +98,7 @@ $(function() {
 					var sentiment = parsed_data["sentiment"]["avg"];
 					display_review_data(food_input, reviews, sentiment);
 				} else {
-					// TODO
+					$("loading-screen").hide();
 				}
 			}, error: function (xhr, ajaxOptions, thrownError) {
 					console.log("error");
